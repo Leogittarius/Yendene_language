@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "language": "雪地语",
+    "schemaVersion": 1
+  },
+
+  "entries": [
+    {
+      "id": "nesmicle",
+      "headword": "nesmicle",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "牧羊人，放牧人，牧民",
+          "gloss": "牧民"
+        }
+      ],
+
+      "formation": {
+        "type": "derived",
+        "analysis": "nesm-icle",
+
+        "components": []
+      },
+
+      "etymology": "由nesm-与-icle组成",
+
+      "variants": [],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [
+        {
+          "source": "Nesmicle | līn dai toduai | ningocaspi",
+          "gloss": "牧民-施事 | 羊群-承受 | 走-使动",
+          "translation": "牧羊人赶走羊群。"
+        }
+      ],
+
+      "status": "established",
+
+      "tags": ["职业", "畜牧业"],
+
+      "notes": ""
+    },
+    {
+      "id": "matalge",
+      "headword": "matalge",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "勇者，勇士，大人，令人尊敬的人，英雄",
+          "gloss": "英雄"
+        }
+      ],
+
+      "formation": {
+        "type": "derived",
+        "analysis": "ma-talge",
+
+        "components": []
+      },
+
+      "etymology": "",
+
+      "variants": [],
+
+      "relations": {
+        "related": [],
+        "synonyms": ["cumlolle"],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [
+        {
+          "source": "Matalgie| ciotātari",
+          "gloss": "英雄-使成 | 死亡",
+          "translation": "他作为英雄而死去了。"
+        }
+      ],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
+    },
+    {
+      "id": "yem-danallo-tacce",
+      "headword": "Yem Danallo tacce",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "叶牡丹城",
+          "gloss": "叶牡丹城"
+        }
+      ],
+
+      "formation": {
+        "type": "compound",
+        "analysis": "Yem Dan-allo tacce",
+
+        "components": [
+            {
+                "ref": "yem-dan",
+                "form":"Yem Danallo"
+            }, 
+            {
+                "ref":"tacce",
+                "form":"tacce"
+            }
+        ]
+      },
+
+      "etymology": "由Yem Dan的构建态Yem Danallo与tacce构成",
+
+      "variants": [
+        {
+            "form":"Yemdane"
+        }, 
+        {
+            "form": "Yem Dane"
+        },
+        {
+            "form":"Yemdanallo tacce"
+        }, 
+        {
+            "form": "Yemdantacce"
+        }
+    ],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [
+        {
+          "source": "Yem Danallo tacciò| tardava.",
+          "gloss": "叶牡丹城-终点 | 去",
+          "translation": "我到叶牡丹城去。"
+        }
+      ],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
+    },
+    {
+      "id": "nu",
+      "headword": "nu(-e)",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "狗，犬",
+          "gloss": "狗"
+        }
+      ],
+
+      "formation": {
+        "type": "root",
+        "analysis": "",
+
+        "components": [
+            {
+                "ref": "",
+                "form":""
+            }, 
+            {
+                "ref":"",
+                "form":""
+            }
+        ]
+      },
+
+      "etymology": "",
+
+      "variants": [
+        {
+            "form":"nue",
+            "label":"不同的词典拼写"
+        }, 
+        {
+            "form": "nu-e",
+            "label":"不同的词典拼写"
+        },
+        {
+            "form":"nu(-e)",
+            "label":"不同的词典拼写"
+        }, 
+        {
+            "form": "gode",
+            "label":"方言"
+        }
+    ],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [
+        {
+          "source": "De | nue| miggari.",
+          "gloss": "定冠词-施事 | 狗-施事 | 跑",
+          "translation": "那狗跑掉了。"
+        }
+      ],
+
+      "status": "established",
+
+      "tags": ["动物"],
+
+      "notes": ""
+    },
+    {
+      "id": "moni",
+      "headword": "moni(-e)",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "角，动物头部的角",
+          "gloss": "角"
+        },
+        {
+          "definition": "角状突起物",
+          "gloss": "凸起"
+        }
+      ],
+
+      "formation": {
+        "type": "root",
+        "analysis": "",
+
+        "components": [
+            {
+                "ref": "",
+                "form":""
+            }, 
+            {
+                "ref":"",
+                "form":""
+            }
+        ]
+      },
+
+      "etymology": "",
+
+      "variants": [
+    ],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [
+        {
+          "source": "Sentoisce | de | monie | paitaros.",
+          "gloss": "房子-施事 | 的 |角| 坏了",
+          "translation": "房檐的角落坏了（漏了或塌了）"
+        }
+      ],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
+    }
+  ]
+}

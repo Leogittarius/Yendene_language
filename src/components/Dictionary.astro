@@ -1,0 +1,833 @@
+---
+import dictionary from '@data/dictionary.json';
+import Gloss from '@components/Gloss.astro';
+
+const entries = dictionary.entries;
+
+function stripDiacritics(value) {
+    return String(value)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+}
+
+function getSearchText(entry) {
+    const relationValues = entry.relations
+        ? Object.values(entry.relations).flat()
+        : [];
+
+    const values = [
+        entry.id,
+        entry.headword,
+
+        ...(entry.pos ?? []),
+
+        ...(entry.senses ?? []).flatMap((sense) => [
+            sense.definition,
+            sense.gloss,
+        ]),
+
+        entry.formation?.type,
+        entry.formation?.analysis,
+
+        ...(entry.formation?.components ?? []).flatMap((component) => [
+            component.ref,
+            component.form,
+        ]),
+
+        entry.etymology,
+
+        ...(entry.variants ?? []).flatMap((variant) => [
+            variant.form,
+            variant.label,
+        ]),
+
+        ...relationValues,
+
+        ...(entry.tags ?? []),
+
+        ...(entry.examples ?? []).flatMap((example) => [
+            example.source,
+            example.gloss,
+            example.translation,
+        ]),
+
+        entry.notes,
+    ]
+        .filter(Boolean)
+        .join(' ');
+
+    return `${values} ${stripDiacritics(values)}`.toLowerCase();
+}
+
+
+const posLabels = {
+    noun: '名词',
+    verb: '动词',
+    'state-verb': '状态动词',
+    adjective: '形容词',
+    adverb: '副词',
+    pronoun: '代词',
+    numeral: '数词',
+    particle: '助词',
+    conjunction: '连词',
+    adposition: '介词 / 后置词',
+    modal: '情态词',
+    classifier: '量词',
+};
+
+const formationLabels = {
+    root: '词根',
+    simple: '单纯词',
+    derived: '派生',
+    compound: '复合',
+    reduplicated: '重叠词',
+    ideophonic: '拟声 / 表意词',
+    opaque: '构词不透明',
+    borrowed: '借词',
+};
+
+function getPosLabel(pos) {
+    return posLabels[pos] ?? pos;
+}
+
+function getFormationLabel(type) {
+    return formationLabels[type] ?? type;
+}
+---
+
+<div class="dictionary">
+
+    <div class="dictionary-tools">
+
+        <label for="dictionary-search" class="search-label">
+            搜索词典
+        </label>
+
+        <input
+            id="dictionary-search"
+            class="dictionary-search"
+            type="search"
+            placeholder="搜索词形、释义、变体、标签……"
+            autocomplete="off"
+        />
+
+        <div class="dictionary-summary">
+            当前显示
+            <strong id="dictionary-visible-count">
+                {entries.length}
+            </strong>
+            个词条，共
+            <strong>{entries.length}</strong>
+            个词条。
+        </div>
+
+    </div>
+
+<div
+    id="dictionary-empty"
+    class="dictionary-empty"
+    hidden
+>
+    没有找到符合条件的词条。
+</div>
+
+    <div class="entry-list">
+        {
+            entries.map((entry) => (
+                <article
+                    class="dictionary-entry"
+                    id={entry.id}
+                    data-dictionary-entry
+                    data-search={getSearchText(entry)}
+                >
+
+                    <header class="entry-header">
+                        <div>
+                            <h2 class="headword">
+                                {entry.headword}
+                            </h2>
+
+                            <div class="entry-meta">
+                                {
+                                    entry.pos.map((pos) => (
+                                        <span class="pos">
+                                            {getPosLabel(pos)}
+                                        </span>
+                                    ))
+                                }
+
+                                {
+                                    entry.status === 'draft' && (
+                                        <span class="status draft">
+                                            草案
+                                        </span>
+                                    )
+                                }
+
+                                {
+                                    entry.status === 'deprecated' && (
+                                        <span class="status deprecated">
+                                            已废弃
+                                        </span>
+                                    )
+                                }
+                            </div>
+                        </div>
+
+                        {
+                            entry.pronunciation?.ipa && (
+                                <div class="ipa">
+                                    /{entry.pronunciation.ipa}/
+                                </div>
+                            )
+                        }
+                    </header>
+
+
+                    <section class="senses">
+                        {
+                            entry.senses.map((sense, index) => (
+                                <div class="sense">
+                                    {
+                                        entry.senses.length > 1 && (
+                                            <span class="sense-number">
+                                                {index + 1}.
+                                            </span>
+                                        )
+                                    }
+
+                                    <span>
+                                        {sense.definition}
+                                    </span>
+                                </div>
+                            ))
+                        }
+                    </section>
+
+
+                    {
+                        entry.formation && (
+                            <section class="entry-section">
+                                <h3>构词</h3>
+
+                                <div class="formation">
+                                    <span class="formation-type">
+                                        {getFormationLabel(entry.formation.type)}
+                                    </span>
+
+                                    {
+                                        entry.formation.analysis && (
+                                            <span class="formation-analysis">
+                                                {entry.formation.analysis}
+                                            </span>
+                                        )
+                                    }
+                                </div>
+
+                                {
+                                    entry.formation.components?.length > 0 && (
+                                        <div class="components">
+                                            {
+                                                entry.formation.components.map((component) => (
+                                                    <span class="component">
+                                                        {component.form}
+                                                    </span>
+                                                ))
+                                            }
+                                        </div>
+                                    )
+                                }
+                            </section>
+                        )
+                    }
+
+
+                    {
+                        entry.etymology && (
+                            <section class="entry-section">
+                                <h3>词源</h3>
+                                <p>{entry.etymology}</p>
+                            </section>
+                        )
+                    }
+
+
+                    {
+                        entry.variants?.length > 0 && (
+                            <section class="entry-section">
+                                <h3>异体与变体</h3>
+
+                                <div class="variant-list">
+                                    {
+                                        entry.variants.map((variant) => (
+                                            <div class="variant">
+                                                <span class="variant-form">
+                                                    {variant.form}
+                                                </span>
+
+                                                {
+                                                    variant.label && (
+                                                        <span class="variant-label">
+                                                            {variant.label}
+                                                        </span>
+                                                    )
+                                                }
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </section>
+                        )
+                    }
+
+
+                    {
+                        entry.tags?.length > 0 && (
+                            <section class="entry-section">
+                                <h3>标签</h3>
+
+                                <div class="tags">
+                                    {
+                                        entry.tags.map((tag) => (
+                                            <span class="tag">
+                                                {tag}
+                                            </span>
+                                        ))
+                                    }
+                                </div>
+                            </section>
+                        )
+                    }
+
+
+                    {
+                        entry.examples?.length > 0 && (
+                            <section class="entry-section examples">
+                                <h3>例句</h3>
+
+                                {
+                                    entry.examples.map((example) => (
+                                        <Gloss
+                                            source={example.source}
+                                            gloss={example.gloss}
+                                            translation={example.translation}
+                                        />
+                                    ))
+                                }
+                            </section>
+                        )
+                    }
+
+
+                    {
+                        entry.notes && (
+                            <section class="entry-section">
+                                <h3>备注</h3>
+                                <p>{entry.notes}</p>
+                            </section>
+                        )
+                    }
+
+                </article>
+            ))
+        }
+    </div>
+
+</div>
+
+
+<style>
+
+    .dictionary {
+        margin-top: 1.5rem;
+    }
+
+
+    /* ========================================
+       Summary
+       ======================================== */
+
+    .dictionary-summary {
+        margin-bottom: 1.8rem;
+
+        color: var(--sl-color-gray-2);
+        font-size: 0.92rem;
+    }
+
+
+    /* ========================================
+       Entry
+       ======================================== */
+    .entry-list {
+        display: grid;
+        gap: 1.15rem;
+    }
+
+    .dictionary-entry {
+    padding: 1.35rem 1.45rem 1.5rem;
+
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.55rem;
+
+    box-shadow: none;
+    }
+
+    :root[data-theme='light'] .dictionary-entry {
+        background: #f8fbfc;
+        border-color: #d6e2e8;
+    }
+
+    :root[data-theme='dark'] .dictionary-entry {
+        background: #101f27;
+        border-color: #273c47;
+    }
+
+
+    /* ========================================
+       Header
+       ======================================== */
+
+    .entry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        gap: 1.5rem;
+
+        margin-bottom: 1rem;
+        padding-bottom: 0.9rem;
+
+        border-bottom: 1px solid var(--sl-color-hairline-light);
+    }
+
+    .headword {
+        margin: 0 !important;
+
+        color: var(--sl-color-white);
+
+        font-size: 1.55rem;
+        font-weight: 680;
+        letter-spacing: -0.025em;
+
+        background: transparent !important;
+    }
+
+    .entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 0.45rem;
+
+        margin-top: 0.45rem;
+    }
+
+    .pos,
+    .status {
+        display: inline-flex;
+        align-items: center;
+
+        padding:
+            0.14rem
+            0.48rem;
+
+        border-radius: 0.3rem;
+
+        font-size: 0.78rem;
+        line-height: 1.4;
+    }
+
+    .pos {
+        background: var(--sl-color-accent-low);
+        color: var(--sl-color-accent-high);
+    }
+
+    .status {
+        background: var(--sl-color-gray-6);
+        color: var(--sl-color-gray-2);
+    }
+
+    .status.draft {
+        font-style: italic;
+    }
+
+    .status.deprecated {
+        text-decoration: line-through;
+    }
+
+    .ipa {
+        flex: 0 0 auto;
+
+        padding-top: 0.25rem;
+
+        color: var(--sl-color-gray-2);
+
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+
+    /* ========================================
+       Senses
+       ======================================== */
+
+    .senses {
+        margin-block: 1rem 1.25rem;
+    }
+
+    .sense {
+        display: flex;
+
+        gap: 0.45rem;
+
+        margin-top: 0.35rem;
+
+        color: var(--sl-color-gray-1);
+
+        line-height: 1.7;
+    }
+
+    .sense:first-child {
+        margin-top: 0;
+    }
+
+    .sense-number {
+        flex: 0 0 auto;
+
+        color: var(--sl-color-gray-3);
+
+        font-variant-numeric: tabular-nums;
+    }
+
+
+    /* ========================================
+       Subsections
+       ======================================== */
+
+    .entry-section {
+        margin-top: 1.1rem;
+    }
+
+    .entry-section h3 {
+        margin:
+            0
+            0
+            0.45rem !important;
+
+        color: var(--sl-color-gray-2);
+
+        font-size: 0.82rem;
+        font-weight: 650;
+
+        letter-spacing: 0.06em;
+    }
+
+    .entry-section p {
+        margin: 0 !important;
+
+        color: var(--sl-color-gray-1);
+
+        line-height: 1.7;
+    }
+
+
+    /* ========================================
+       Formation
+       ======================================== */
+
+    .formation {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+
+        gap: 0.7rem;
+    }
+
+    .formation-type {
+        color: var(--sl-color-gray-1);
+    }
+
+    .formation-analysis {
+        color: var(--sl-color-accent-high);
+
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Consolas,
+            monospace;
+
+        font-size: 0.9rem;
+    }
+
+    .components {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 0.4rem;
+
+        margin-top: 0.5rem;
+    }
+
+    .component {
+        color: var(--sl-color-gray-2);
+
+        font-size: 0.88rem;
+    }
+
+
+    /* ========================================
+       Variants
+       ======================================== */
+
+    .variant-list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 0.35rem;
+    }
+
+    .variant {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+
+        gap: 0.7rem;
+    }
+
+    .variant-form {
+        color: var(--sl-color-gray-1);
+
+        font-weight: 550;
+    }
+
+    .variant-label {
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.85rem;
+    }
+
+
+    /* ========================================
+       Tags
+       ======================================== */
+
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 0.4rem;
+    }
+
+    .tag {
+        padding:
+            0.13rem
+            0.45rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.3rem;
+
+        color: var(--sl-color-gray-2);
+
+        font-size: 0.78rem;
+    }
+
+
+    /* ========================================
+       Examples
+       ======================================== */
+
+    .examples :global(.gloss) {
+        margin-block: 0.7rem 0;
+    }
+
+
+    /* ========================================
+       Mobile
+       ======================================== */
+
+    @media (max-width: 40rem) {
+
+        .entry-header {
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .ipa {
+            padding-top: 0;
+        }
+
+        .dictionary-entry {
+            padding-block: 1.5rem;
+        }
+
+    }
+
+
+    /* ========================================
+        Dictionary tools / search
+        ======================================== */
+
+    .dictionary-tools {
+        margin-bottom: 1.8rem;
+    }
+
+    .search-label {
+        display: block;
+
+        margin-bottom: 0.45rem;
+
+        color: var(--sl-color-gray-1);
+
+        font-size: 0.88rem;
+        font-weight: 650;
+    }
+
+    .dictionary-search {
+        width: 100%;
+
+        padding:
+            0.72rem
+            0.9rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.5rem;
+
+        background: var(--sl-color-bg);
+
+        color: var(--sl-color-white);
+
+        font: inherit;
+
+        font-size: 0.95rem;
+
+        outline: none;
+
+        transition:
+            border-color 150ms ease,
+            background-color 150ms ease;
+    }
+
+    .dictionary-search:focus {
+        border-color:
+            var(--sl-color-accent);
+    }
+
+    :root[data-theme='light']
+    .dictionary-search {
+        background: #f8fbfc;
+        border-color: #ccdce4;
+    }
+
+    :root[data-theme='dark']
+    .dictionary-search {
+        background: #101f27;
+        border-color: #2a414d;
+    }
+
+    .dictionary-summary {
+        margin-top: 0.65rem;
+        margin-bottom: 0;
+
+        color: var(--sl-color-gray-2);
+
+        font-size: 0.84rem;
+    }
+
+    .dictionary-empty {
+        padding: 2rem 1rem;
+
+        text-align: center;
+
+        color: var(--sl-color-gray-2);
+    }
+
+    .dictionary-entry[hidden] {
+    display: none !important;
+}
+
+
+
+
+</style>
+
+
+<script>
+    function initialiseDictionarySearch() {
+        const dictionary = document.querySelector('.dictionary');
+
+        if (!dictionary) return;
+
+        const input =
+            dictionary.querySelector('#dictionary-search');
+
+        const entries =
+            Array.from(
+                dictionary.querySelectorAll(
+                    '[data-dictionary-entry]'
+                )
+            );
+
+        const count =
+            dictionary.querySelector(
+                '#dictionary-visible-count'
+            );
+
+        const empty =
+            dictionary.querySelector(
+                '#dictionary-empty'
+            );
+
+        if (!input || !count || !empty) return;
+
+        const normalize = (value) =>
+            value
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
+
+        const update = () => {
+            const query = normalize(input.value);
+
+            const terms = query
+                .split(/\s+/)
+                .filter(Boolean);
+
+            let visible = 0;
+
+            entries.forEach((entry) => {
+                const searchText =
+                    entry.dataset.search ?? '';
+
+                const matches =
+                    terms.length === 0 ||
+                    terms.every((term) =>
+                        searchText.includes(term)
+                    );
+
+                entry.hidden = !matches;
+
+                if (matches) {
+                    visible += 1;
+                }
+            });
+
+            count.textContent =
+                String(visible);
+
+            empty.hidden =
+                visible !== 0;
+        };
+
+        input.addEventListener('input', update);
+
+        update();
+    }
+
+    initialiseDictionarySearch();
+</script>
