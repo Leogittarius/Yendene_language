@@ -1,40 +1,94 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: 雪地语资料库
+description: 雪地语的语言资料、语法、词典与语料。
+template: splash
+
 hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
+  title: 雪地语
+  tagline: 一门持续构建中的人造语言
   actions:
-    - text: Example Guide
-      link: /guides/example/
-      icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
-      variant: minimal
+    - text: 语言介绍
+      link: /introduction/
+      variant: secondary
+
+    - text: 语法
+      link: /grammar/
+      variant: secondary
+
+    - text: 词典
+      link: /dictionary/
+      variant: secondary
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-## Next steps
+import Gloss from '@components/Gloss.astro';
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+## 关于雪地语
+
+雪地语是一门持续设计中的人造语言。
+
+本站用于整理其音系、语法、词汇、例文以及语言设计记录。
+
+
+<Gloss
+    source="王 | 臣-与 | 剑 | 赐 | 已"
+    gloss="king | minister-DAT | sword | give | PFV"
+    translation="王已经把剑赐给臣子了。"
+/>
+
+
+<Gloss
+    source="PN-lumunargie | Borah-fōnus | nirbavos"
+    gloss="PN结-施事 | 硼砂-工具 | 制作"
+    translation="制成PN结时要掺入硼砂。"
+/>
+
+
+<Gloss
+    source="Nesmicle | līn dai toduai | ningocaspi"
+    gloss="牧羊人-施事 | 羊群-承受 | 走-使动"
+    translation="牧羊人赶走羊群。"
+/>
+
+## 语言资料
+
+<CardGrid>
+
+<LinkCard
+  title="语言介绍"
+  href="/introduction/"
+  description="了解雪地语的基本特点与设计目标。"
+/>
+
+<LinkCard
+  title="音系"
+  href="/phonology/"
+  description="音位、音节结构、声调与音系规则。"
+/>
+
+<LinkCard
+  title="语法"
+  href="/grammar/"
+  description="词法、句法与主要语法体系。"
+/>
+
+<LinkCard
+  title="词典"
+  href="/dictionary/"
+  description="查询词汇、词义、词源与派生关系。"
+/>
+
+<LinkCard
+  title="例文"
+  href="/texts/"
+  description="阅读雪地语例句、短文与翻译文本。"
+/>
+
+<LinkCard
+  title="文章"
+  href="/articles/"
+  description="语言设计笔记、讨论与开发记录。"
+/>
+
 </CardGrid>

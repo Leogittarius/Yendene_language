@@ -1,0 +1,360 @@
+/* ========================================
+   雪地语资料库 - Cold Snow Minimal Theme
+   ======================================== */
+
+/* ---------- Dark mode ---------- */
+:root {
+    --sl-color-accent-low: #10283a;
+    --sl-color-accent: #78bfe8;
+    --sl-color-accent-high: #d8f0ff;
+
+    --sl-color-white: #f4f9fc;
+    --sl-color-gray-1: #e3edf3;
+    --sl-color-gray-2: #bacad4;
+    --sl-color-gray-3: #899daa;
+    --sl-color-gray-4: #5b707e;
+    --sl-color-gray-5: #334753;
+    --sl-color-gray-6: #1d303b;
+    --sl-color-black: #0c171e;
+
+    --sl-color-bg: #0c171e;
+    --sl-color-bg-nav: #101d25;
+    --sl-color-bg-sidebar: #0f1b22;
+
+    --sl-color-hairline: #253741;
+    --sl-color-hairline-light: #1b2b34;
+
+    --sl-font:
+        Inter,
+        "Noto Sans SC",
+        "Microsoft YaHei",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        system-ui,
+        sans-serif;
+
+    --sl-content-width: 52rem;
+}
+
+
+/* ---------- Light mode ---------- */
+:root[data-theme='light'] {
+    --sl-color-accent-low: #e4f3fb;
+    --sl-color-accent: #4f94bd;
+    --sl-color-accent-high: #174c68;
+
+    --sl-color-white: #17242c;
+    --sl-color-gray-1: #273943;
+    --sl-color-gray-2: #536874;
+    --sl-color-gray-3: #81939d;
+    --sl-color-gray-4: #aab9c1;
+    --sl-color-gray-5: #d3dee4;
+    --sl-color-gray-6: #ebf1f4;
+    --sl-color-gray-7: #f5f9fb;
+    --sl-color-black: #fbfdfe;
+
+    --sl-color-bg: #fbfdfe;
+    --sl-color-bg-nav: #f5f9fb;
+    --sl-color-bg-sidebar: #f8fbfc;
+
+    --sl-color-hairline: #dce6eb;
+    --sl-color-hairline-light: #e9f0f3;
+}
+
+
+/* ========================================
+   Overall typography
+   ======================================== */
+
+body {
+    letter-spacing: 0.005em;
+}
+
+.sl-markdown-content {
+    line-height: 1.85;
+}
+
+.sl-markdown-content p {
+    margin-block: 1em;
+}
+
+.sl-markdown-content h2 {
+    margin-top: 2.2em;
+    letter-spacing: -0.015em;
+}
+
+.sl-markdown-content h3 {
+    margin-top: 1.8em;
+}
+
+
+/* ========================================
+   Top navigation
+   ======================================== */
+
+header {
+    border-bottom-color: var(--sl-color-hairline-light);
+}
+
+:root[data-theme='light'] header {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(248, 252, 254, 0.98),
+            rgba(244, 249, 252, 0.95)
+        );
+}
+
+:root[data-theme='dark'] header {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(15, 28, 36, 0.98),
+            rgba(13, 25, 32, 0.96)
+        );
+}
+
+
+/* ========================================
+   Site title
+   ======================================== */
+
+header a[href="/"] {
+    letter-spacing: -0.025em;
+    font-weight: 700;
+}
+
+
+/* ========================================
+   Sidebar
+   ======================================== */
+
+.sidebar-pane {
+    border-inline-end-color: var(--sl-color-hairline-light);
+}
+
+.sidebar-content a {
+    border-radius: 0.35rem;
+}
+
+.sidebar-content a[aria-current='page'] {
+    font-weight: 600;
+}
+
+
+/* ========================================
+   Hero / homepage
+   ======================================== */
+
+.hero h1 {
+    letter-spacing: -0.045em;
+    font-weight: 750;
+}
+
+.hero .tagline {
+    color: var(--sl-color-gray-2);
+    letter-spacing: 0.01em;
+}
+
+/* ========================================
+   Hero actions
+   ======================================== */
+
+.hero .actions {
+    gap: 0.75rem;
+}
+
+.hero .actions a {
+    min-width: 6.4rem;
+    justify-content: center;
+
+    border-radius: 0.45rem;
+    border: 1px solid var(--sl-color-gray-4);
+
+    background: transparent;
+    color: var(--sl-color-white);
+
+    box-shadow: none;
+
+    font-weight: 550;
+
+    transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease,
+        transform 150ms ease;
+}
+
+:root[data-theme='light'] .hero .actions a {
+    border-color: #9fb8c6;
+    background: rgba(247, 251, 253, 0.55);
+}
+
+:root[data-theme='dark'] .hero .actions a {
+    border-color: #496271;
+    background: rgba(17, 32, 41, 0.45);
+}
+
+@media (hover: hover) {
+    :root[data-theme='light'] .hero .actions a:hover {
+        background: #e7f3f9;
+        border-color: var(--sl-color-accent);
+        color: var(--sl-color-accent-high);
+        transform: translateY(-1px);
+    }
+
+    :root[data-theme='dark'] .hero .actions a:hover {
+        background: #17303f;
+        border-color: var(--sl-color-accent);
+        color: var(--sl-color-accent-high);
+        transform: translateY(-1px);
+    }
+}
+
+/* ========================================
+   Homepage cards
+   ======================================== */
+
+
+.card-grid {
+    gap: 1rem;
+}
+
+.card {
+    min-height: 6.2rem;
+
+    padding: 1.15rem 1.2rem;
+
+    border-radius: 0.5rem;
+    border-width: 1px;
+
+    box-shadow: none;
+
+    transition:
+        border-color 150ms ease,
+        background-color 150ms ease,
+        transform 150ms ease;
+}
+
+.card .title {
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.card .description {
+    margin-top: 0.4rem;
+    line-height: 1.55;
+}
+
+:root[data-theme='light'] .card {
+    background: #f8fbfc;
+    border-color: #d6e2e8;
+}
+
+:root[data-theme='dark'] .card {
+    background: #11212a;
+    border-color: #283d49;
+}
+
+@media (hover: hover) {
+    :root[data-theme='light'] .card:hover {
+        background: #f1f8fb;
+        border-color: #9fc4d6;
+        transform: translateY(-2px);
+    }
+
+    :root[data-theme='dark'] .card:hover {
+        background: #162a35;
+        border-color: #49748a;
+        transform: translateY(-2px);
+    }
+}
+
+:root[data-theme='light'] .card {
+    background: rgba(248, 251, 253, 0.72);
+    border-color: #d5e1e7;
+}
+
+:root[data-theme='dark'] .card {
+    background: rgba(19, 34, 43, 0.7);
+    border-color: #283c48;
+}
+
+@media (hover: hover) {
+    .card:hover {
+        transform: translateY(-2px);
+        border-color: var(--sl-color-accent);
+    }
+}
+
+
+/* ========================================
+   Links
+   ======================================== */
+
+.sl-markdown-content a {
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.16em;
+}
+
+
+/* ========================================
+   Search box
+   ======================================== */
+
+site-search button {
+    border-radius: 0.5rem;
+    box-shadow: none;
+}
+
+
+/* ========================================
+   Previous / Next cards
+   ======================================== */
+
+.pagination-links a {
+    border-radius: 0.55rem;
+    box-shadow: none;
+}
+
+
+/* ========================================
+   Code / inline code
+   ======================================== */
+
+:not(pre) > code {
+    border-radius: 0.3rem;
+}
+
+
+/* ========================================
+   Homepage spacing
+   ======================================== */
+
+.hero {
+    padding-block-end: 3.5rem;
+}
+
+.hero + .sl-markdown-content {
+    margin-top: 0;
+}
+
+body:has(.hero) .sl-markdown-content h2 {
+    font-weight: 680;
+    letter-spacing: -0.025em;
+}
+
+
+header a[href="/"] {
+    color: var(--sl-color-accent);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+}
+
+:root[data-theme='light'] header a[href="/"] {
+    color: #397fa6;
+}
+
+:root[data-theme='dark'] header a[href="/"] {
+    color: #79bddd;
+}

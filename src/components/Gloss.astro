@@ -1,0 +1,168 @@
+---
+interface Props {
+    source: string;
+    gloss: string;
+    translation: string;
+    number?: string | number;
+}
+
+const {
+    source,
+    gloss,
+    translation,
+    number
+} = Astro.props;
+
+const sourceItems = source
+    .split('|')
+    .map((item) => item.trim());
+
+const glossItems = gloss
+    .split('|')
+    .map((item) => item.trim());
+
+const itemCount = Math.max(sourceItems.length, glossItems.length);
+
+const items = Array.from({ length: itemCount }, (_, index) => ({
+    source: sourceItems[index] ?? '',
+    gloss: glossItems[index] ?? '',
+}));
+---
+
+<figure class="gloss">
+    <div class="gloss-example">
+        {
+            number && (
+                <div class="gloss-number">
+                    ({number})
+                </div>
+            )
+        }
+
+        <div class="gloss-body">
+            <div class="gloss-words">
+                {
+                    items.map((item) => (
+                        <div class="gloss-word">
+                            <div class="gloss-source">
+                                {item.source}
+                            </div>
+
+                            <div class="gloss-analysis">
+                                {item.gloss}
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <figcaption class="gloss-translation">
+                “{translation}”
+            </figcaption>
+        </div>
+    </div>
+</figure>
+
+<style>
+    .gloss {
+        margin-block: 1.6rem;
+        padding: 1rem 1.1rem;
+
+        border: 1px solid var(--sl-color-hairline);
+        border-radius: 0.5rem;
+
+        background: var(--sl-color-bg-sidebar);
+    }
+
+    .gloss-example {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+
+        min-width: 0;
+    }
+
+    .gloss-number {
+        flex: 0 0 auto;
+
+        padding-top: 0.05rem;
+
+        color: var(--sl-color-gray-2);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .gloss-body {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .gloss-words {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+
+    gap: 1rem;
+
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    }
+
+    .gloss-word {
+        display: grid;
+        grid-template-rows: auto auto;
+        row-gap: 0.15rem;
+
+        flex: 0 0 auto;
+        min-width: max-content;
+
+        margin: 0 !important;
+        padding: 0;
+        align-self: flex-start;
+    }
+
+    .gloss-source {
+        margin: 0 !important;
+        padding: 0;
+
+        color: var(--sl-color-white);
+
+        font-size: 1.02rem;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .gloss-analysis {
+        margin: 0 !important;
+        padding: 0;
+
+        color: var(--sl-color-gray-2);
+
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .gloss-translation {
+    margin: 0.8rem 0 0 !important;
+    padding: 0;
+
+    color: var(--sl-color-gray-1);
+
+    font-size: 0.96rem;
+    line-height: 1.65;
+    }
+
+    @media (max-width: 40rem) {
+        .gloss {
+            padding: 0.9rem;
+        }
+
+        .gloss-example {
+            gap: 0.65rem;
+        }
+
+        .gloss-words {
+            gap: 0.85rem;
+        }
+    }
+</style>
