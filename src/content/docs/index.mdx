@@ -1,23 +1,11 @@
 ---
-title: 雪地语资料库
+title: 雪地语语言文化资料库
 description: 雪地语的语言资料、语法、词典与语料。
 template: splash
 
 hero:
   title: 雪地语
   tagline: 一门持续构建中的人造语言
-  actions:
-    - text: 语言介绍
-      link: /introduction/
-      variant: secondary
-
-    - text: 语法
-      link: /grammar/
-      variant: secondary
-
-    - text: 词典
-      link: /dictionary/
-      variant: secondary
 ---
 
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
@@ -28,7 +16,9 @@ import Gloss from '@components/Gloss.astro';
 
 雪地语是一门持续设计中的人造语言。
 
-本站用于整理其音系、语法、词汇、例文以及语言设计记录。
+本站用于整理雪地语的语言资料、词汇、语法、语料，以及与其相关的世界观和其他资料。
+
+雪地语仍处于持续设计与完善之中，本站内容也将随语言的发展不断更新。
 
 
 <Gloss
@@ -51,44 +41,57 @@ import Gloss from '@components/Gloss.astro';
     translation="牧羊人赶走羊群。"
 />
 
-## 语言资料
+
+## 浏览资料
 
 <CardGrid>
 
 <LinkCard
+  title="资料库介绍"
+  href="/about/"
+  description="关于本站的内容、组织方式与维护说明。"
+/>
+
+<LinkCard
   title="语言介绍"
   href="/introduction/"
-  description="了解雪地语的基本特点与设计目标。"
+  description="了解雪地语的基本背景、主要特点与设计理念。"
 />
 
 <LinkCard
   title="音系"
   href="/phonology/"
-  description="音位、音节结构、声调与音系规则。"
+  description="雪地语的音位、音节结构、声调与音系规则。"
 />
 
 <LinkCard
   title="语法"
   href="/grammar/"
-  description="词法、句法与主要语法体系。"
+  description="系统整理雪地语的词法、句法与主要语法体系。"
 />
 
 <LinkCard
   title="词典"
   href="/dictionary/"
-  description="查询词汇、词义、词源与派生关系。"
+  description="查询雪地语词汇、释义、构词、变体与例句。"
 />
 
 <LinkCard
   title="例文"
   href="/texts/"
-  description="阅读雪地语例句、短文与翻译文本。"
+  description="阅读雪地语例句、短文、故事、翻译与其他语料。"
 />
 
 <LinkCard
-  title="文章"
-  href="/articles/"
-  description="语言设计笔记、讨论与开发记录。"
+  title="世界观与其他资料"
+  href="/world/"
+  description="雪地语所处世界的地理、历史、文化与相关设定。"
+/>
+
+<LinkCard
+  title="雪地语语法书"
+  href="/files/yendene-grammar.pdf"
+  description="阅读完整的雪地语语法书 PDF 版本。"
 />
 
 </CardGrid>

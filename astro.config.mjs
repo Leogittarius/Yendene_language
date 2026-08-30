@@ -5,6 +5,7 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
     integrations: [
         starlight({
+            title: '雪地语资料库',
 
             locales: {
                 root: {
@@ -12,38 +13,92 @@ export default defineConfig({
                     lang: 'zh-CN',
                 },
             },
-            title: '雪地语资料库',
 
             customCss: ['./src/styles/custom.css'],
-            
-                    sidebar: [
-            {
-                label: '语言',
-                items: [
-                    { label: '语言介绍', slug: 'introduction' },
-                    { label: '音系', slug: 'phonology' },
-                    { label: '词典', slug: 'dictionary' },
-                ],
-            },
-            {
-                label: '语法',
-                items: [
-                    { autogenerate: { directory: 'grammar' } },
-                ],
-            },
-            {
-                label: '例文',
-                items: [
-                    { autogenerate: { directory: 'texts' } },
-                ],
-            },
-            {
-                label: '文章',
-                items: [
-                    { autogenerate: { directory: 'articles' } },
-                ],
-            },
-        ],
+
+            sidebar: [
+                {
+                    label: '关于',
+                    items: [
+                        {
+                            label: '资料库介绍',
+                            slug: 'about',
+                        },
+                        {
+                            label: '语言介绍',
+                            slug: 'introduction',
+                        },
+                    ],
+                },
+
+                {
+                    label: '语言资料',
+                    items: [
+                        {
+                            label: '音系',
+                            slug: 'phonology',
+                        },
+                    ],
+                },
+
+                {
+                    label: '语法',
+                    items: [
+                        {
+                            autogenerate: {
+                                directory: 'grammar',
+                            },
+                        },
+                    ],
+                },
+
+                {
+                    label: '例文',
+                    items: [
+                        {
+                            autogenerate: {
+                                directory: 'texts',
+                            },
+                        },
+                    ],
+                },
+
+                {
+                    label: '世界观与其他资料',
+                    items: [
+                        {
+                            autogenerate: {
+                                directory: 'world',
+                            },
+                        },
+                    ],
+                },
+
+                {
+                    label: '工具',
+                    items: [
+                        {
+                            label: '词典',
+                            slug: 'dictionary',
+                        },
+                    ],
+                },
+
+                {
+                    label: '出版物',
+                    items: [
+                        {
+                            label: '雪地语语法书',
+                            link: '/files/yendene-grammar.pdf',
+                            badge: 'PDF',
+                            attrs: {
+                                target: '_blank',
+                                rel: 'noopener noreferrer',
+                            },
+                        },
+                    ],
+                },
+            ],
         }),
     ],
 });

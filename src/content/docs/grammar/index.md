@@ -3,7 +3,7 @@ title: Grammar
 description: An overview of the grammar.
 
 sidebar:
-  label: Overview
+  label: 索引页
   order: 1
 ---
 

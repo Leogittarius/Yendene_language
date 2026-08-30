@@ -3,7 +3,7 @@ title: Texts
 description: Example sentences and texts in the language.
 
 sidebar:
-  label: Overview
+  label: 索引页
   order: 1
 ---
 
