@@ -744,6 +744,55 @@
   "status": "established",
   "tags": [],
   "notes": ""
+},
+{
+  "id": "siecofainse",
+  "headword": "siecofainse",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "今晚，今夜，当晚",
+      "gloss": "今晚"
+    }
+  ],
+  "formation": {
+    "type": "compound",
+    "analysis": "sieco-fainse",
+    "components": [
+      {
+        "ref": "siece",
+        "form": "sieco"
+      },
+      {
+        "ref": "fainse",
+        "form": "fainse"
+      }
+    ]
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [
+    {
+      "source": "Siecofainso | tacco | dhepangia",
+      "gloss": "今晚-方位 | 城市-方位 | 睡觉-将来时",
+      "translation": "今晚我要在城市里睡觉"
+    }
+  ],
+  "status": "established",
+  "tags": [],
+  "notes": ""
 }
     
   ]

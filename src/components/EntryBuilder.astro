@@ -5,13 +5,32 @@ const lookupEntries = dictionary.entries.map((entry) => ({
     id: entry.id,
     headword: entry.headword,
     pos: entry.pos ?? [],
+
+    senses: (entry.senses ?? []).map((sense) => ({
+        definition: sense.definition ?? '',
+        gloss: sense.gloss ?? '',
+    })),
+
     definitions: (entry.senses ?? [])
         .map((sense) => sense.definition)
         .filter(Boolean),
+
     glosses: (entry.senses ?? [])
         .map((sense) => sense.gloss)
         .filter(Boolean),
+
+    variants: (entry.variants ?? [])
+        .map((variant) =>
+            typeof variant === 'string'
+                ? variant
+                : variant.form
+        )
+        .filter(Boolean),
 }));
+
+const lookupJson =
+    JSON.stringify(lookupEntries)
+        .replace(/</g, '\\u003c');
 ---
 
 <div class="entry-builder">
@@ -283,9 +302,40 @@ const lookupEntries = dictionary.entries.map((entry) => ({
 
 
         <!-- =====================================
-             Other
+             Examples
              ===================================== -->
 
+        <section class="builder-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>例句</h2>
+
+                    <span class="field-help">
+                        每个例句由若干分析成分组成。
+                        词典词条负责提供基本 Gloss，
+                        句中形式由你填写，语法特征将自动附加到 Gloss。
+                    </span>
+                </div>
+
+                <button
+                    id="eb-add-example"
+                    class="small-button"
+                    type="button"
+                >
+                    ＋ 添加例句
+                </button>
+
+            </div>
+
+            <div id="eb-example-list"></div>
+
+        </section>
+
+        <!-- =====================================
+             Other
+             ===================================== -->
         <section class="builder-section">
             <h2>其他</h2>
 
@@ -323,55 +373,55 @@ const lookupEntries = dictionary.entries.map((entry) => ({
     </div>
 
 
-    <!-- =====================================
-         Output
-         ===================================== -->
+        <!-- =====================================
+            Output
+            ===================================== -->
 
-    <aside class="builder-output">
+        <aside class="builder-output">
 
-        <div class="output-header">
+            <div class="output-header">
 
-            <div>
-                <h2>生成结果</h2>
+                <div>
+                    <h2>生成结果</h2>
 
-                <p>
-                    生成单个词条对象，可直接加入
-                    dictionary.json 的 entries 数组。
-                </p>
+                    <p>
+                        生成单个词条对象，可直接加入
+                        dictionary.json 的 entries 数组。
+                    </p>
+                </div>
+
+                <button
+                    id="eb-copy"
+                    class="copy-button"
+                    type="button"
+                    disabled
+                >
+                    复制 JSON
+                </button>
+
             </div>
 
-            <button
-                id="eb-copy"
-                class="copy-button"
-                type="button"
-                disabled
-            >
-                复制 JSON
-            </button>
+            <div
+                id="eb-validation"
+                class="validation"
+            ></div>
 
-        </div>
+            <textarea
+                id="eb-output"
+                class="json-output"
+                readonly
+                spellcheck="false"
+            ></textarea>
 
-        <div
-            id="eb-validation"
-            class="validation"
-        ></div>
+        </aside>
 
-        <textarea
-            id="eb-output"
-            class="json-output"
-            readonly
-            spellcheck="false"
-        ></textarea>
-
-    </aside>
-
-</div>
+    </div>
 
 
 <script
     id="eb-existing-entries"
     type="application/json"
-    set:html={JSON.stringify(lookupEntries)}
+    set:html={lookupJson}
 ></script>
 
 
@@ -941,7 +991,290 @@ const lookupEntries = dictionary.entries.map((entry) => ({
 </style>
 
 
+
+<style is:global>
+
+    .entry-builder .example-item {
+        padding: 1rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.5rem;
+
+        margin:
+            0
+            0
+            0.8rem !important;
+    }
+
+    .entry-builder .example-item:last-child {
+        margin-bottom: 0 !important;
+    }
+
+
+    .entry-builder .example-component {
+        padding: 0.8rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        border-radius: 0.42rem;
+
+        margin:
+            0
+            0
+            0.6rem !important;
+    }
+
+
+    .entry-builder .example-component-main {
+        display: grid;
+
+        grid-template-columns:
+            minmax(10rem, 1.2fr)
+            minmax(8rem, 1fr)
+            minmax(8rem, 0.7fr);
+
+        gap: 0.6rem;
+    }
+
+
+    .entry-builder .example-component-main .field {
+        margin-bottom: 0 !important;
+    }
+
+
+    .entry-builder .example-picker {
+        position: relative;
+    }
+
+
+    .entry-builder .example-search-results {
+        position: absolute;
+
+        z-index: 30;
+
+        top: calc(100% + 0.3rem);
+        left: 0;
+        right: 0;
+
+        max-height: 18rem;
+
+        overflow-y: auto;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.42rem;
+
+        background:
+            var(--sl-color-bg);
+
+        box-shadow:
+            0 0.5rem 1.5rem
+            rgba(0, 0, 0, 0.14);
+    }
+
+
+    .entry-builder
+    .example-search-results[hidden] {
+        display: none;
+    }
+
+
+    .entry-builder .example-search-result {
+        display: block;
+
+        width: 100%;
+
+        margin: 0 !important;
+        padding: 0.55rem 0.65rem;
+
+        border: 0;
+
+        border-bottom:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        background: transparent;
+
+        color:
+            var(--sl-color-gray-1);
+
+        text-align: left;
+
+        font: inherit;
+
+        cursor: pointer;
+    }
+
+
+    .entry-builder
+    .example-search-result:hover {
+        background:
+            var(--sl-color-accent-low);
+    }
+
+
+    .entry-builder .example-sense {
+        margin-top: 0.4rem !important;
+    }
+
+
+    .entry-builder .example-word-status {
+        display: block;
+
+        margin-top: 0.35rem;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.72rem;
+    }
+
+
+    .entry-builder
+    .example-word-status.valid {
+        color:
+            var(--sl-color-accent-high);
+    }
+
+
+    .entry-builder .example-feature-area {
+        margin-top: 0.7rem;
+    }
+
+
+    .entry-builder .nominal-features {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 0.6rem;
+    }
+
+    .entry-builder .morph-features {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr);
+
+        gap: 0.6rem;
+    }
+
+    .entry-builder .verb-feature-slots {
+        display: grid;
+
+        gap: 0.45rem;
+    }
+
+
+    .entry-builder .verb-feature-row {
+        display: grid;
+
+        grid-template-columns:
+            4rem
+            minmax(7rem, 0.8fr)
+            minmax(8rem, 1fr);
+
+        gap: 0.5rem;
+
+        align-items: center;
+    }
+
+
+    .entry-builder .feature-number {
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.75rem;
+    }
+
+
+    .entry-builder .example-preview {
+        margin-top: 0.9rem;
+
+        padding-top: 0.9rem;
+
+        border-top:
+            1px solid
+            var(--sl-color-hairline);
+    }
+
+
+    .entry-builder .example-preview textarea {
+        min-height: 4rem;
+    }
+
+
+    .entry-builder .example-components {
+        margin-top: 0.7rem;
+    }
+
+
+    .entry-builder .example-actions {
+        display: flex;
+
+        justify-content: flex-end;
+
+        margin-top: 0.7rem;
+    }
+
+
+    @media (max-width: 48rem) {
+
+        .entry-builder
+        .example-component-main,
+
+        .entry-builder
+        .nominal-features {
+
+            grid-template-columns: 1fr;
+
+        }
+
+
+        .entry-builder
+        .verb-feature-row {
+
+            grid-template-columns: 1fr;
+
+        }
+
+    }
+
+
+    .entry-builder .nominal-features[hidden],
+    .entry-builder .verb-features[hidden],
+    .entry-builder .morph-features[hidden] {
+        display: none !important;
+    }
+
+
+
+
+
+
+
+
+</style>
+
+
 <script>
+
+    function makeGlossFromDefinition(value) {
+
+        return String(value)
+            .split(/[，,、；;\/／]/)
+            .map((part) => part.trim())
+            .find(Boolean) ?? '';
+
+    }
 
     function initialiseEntryBuilder() {
 
@@ -971,7 +1304,172 @@ const lookupEntries = dictionary.entries.map((entry) => ({
                     (entry) => entry.id
                 )
             );
+        const CASE_OPTIONS = [
+            '施事',
+            '客体',
+            '承受',
+            '使成',
+            '受益',
+            '目的',
+            '源点',
+            '方位',
+            '工具',
+            '伴随',
+        ];
 
+
+        const NOUN_NUMBER_OPTIONS = [
+            '单数',
+            '复数',
+            '不可数',
+        ];
+
+
+        const VERB_FEATURES = {
+
+            tense: {
+                label: '时',
+
+                values: [
+                    {
+                        value: 'present',
+                        label: '现在',
+                        gloss: '现在时',
+                    },
+                    {
+                        value: 'past',
+                        label: '过去',
+                        gloss: '过去时',
+                    },
+                    {
+                        value: 'future',
+                        label: '将来',
+                        gloss: '将来时',
+                    },
+                ],
+            },
+
+
+            aspect: {
+                label: '体',
+
+                values: [
+                    {
+                        value: 'progressive',
+                        label: '进行',
+                        gloss: '进行体',
+                    },
+                    {
+                        value: 'perfect',
+                        label: '完成',
+                        gloss: '完成体',
+                    },
+                    {
+                        value: 'general',
+                        label: '一般',
+                        gloss: '一般体',
+                    },
+                ],
+            },
+
+
+            voice: {
+                label: '语态',
+
+                values: [
+                    {
+                        value: 'active',
+                        label: '主动',
+                        gloss: '主动',
+                    },
+                    {
+                        value: 'passive',
+                        label: '被动',
+                        gloss: '被动',
+                    },
+                    {
+                        value: 'causative',
+                        label: '使动',
+                        gloss: '使动',
+                    },
+                ],
+            },
+
+
+            person: {
+                label: '人称',
+
+                values: [
+                    {
+                        value: 'first',
+                        label: '第一',
+                        gloss: '第一人称',
+                    },
+                    {
+                        value: 'second',
+                        label: '第二',
+                        gloss: '第二人称',
+                    },
+                    {
+                        value: 'third',
+                        label: '第三',
+                        gloss: '第三人称',
+                    },
+                    {
+                        value: 'uncountable',
+                        label: '不可数',
+                        gloss: '不可数',
+                    },
+                ],
+            },
+
+
+            number: {
+                label: '数',
+
+                values: [
+                    {
+                        value: 'singular',
+                        label: '单数',
+                        gloss: '单数',
+                    },
+                    {
+                        value: 'plural',
+                        label: '复数',
+                        gloss: '复数',
+                    },
+                    {
+                        value: 'uncountable',
+                        label: '不可数',
+                        gloss: '不可数',
+                    },
+                ],
+            },
+
+
+            mood: {
+                label: '语气',
+
+                values: [
+                    {
+                        value: 'realis',
+                        label: '实然',
+                        gloss: '实然',
+                    },
+                    {
+                        value: 'irrealis',
+                        label: '未然',
+                        gloss: '未然',
+                    },
+                    {
+                        value: 'persistent',
+                        label: '依然',
+                        gloss: '依然',
+                    },
+                ],
+            },
+
+        };
 
         /* =====================================
            Elements
@@ -1038,6 +1536,16 @@ const lookupEntries = dictionary.entries.map((entry) => ({
 
         const notes =
             root.querySelector('#eb-notes');
+
+        const exampleList =
+            root.querySelector(
+                '#eb-example-list'
+            );
+
+        const addExampleButton =
+            root.querySelector(
+                '#eb-add-example'
+            );
 
         const output =
             root.querySelector('#eb-output');
@@ -1200,6 +1708,16 @@ const lookupEntries = dictionary.entries.map((entry) => ({
            Senses
            ===================================== */
 
+        function makeGlossFromDefinition(value) {
+
+            return String(value)
+                .split(/[，,、；;\/／]/)
+                .map((part) => part.trim())
+                .find(Boolean) ?? '';
+
+        }
+
+
         function refreshSenseNumbers() {
 
             const items =
@@ -1242,6 +1760,18 @@ const lookupEntries = dictionary.entries.map((entry) => ({
             item.className =
                 'dynamic-item sense-item';
 
+            /*
+             * false：
+             * Gloss 仍然由释义自动生成。
+             *
+             * true：
+             * 用户已经手动修改 Gloss，
+             * 此后不再自动覆盖。
+             */
+            item.dataset.glossManual =
+                gloss ? 'true' : 'false';
+
+
             item.innerHTML = `
                 <div class="dynamic-item-header">
                     <span class="dynamic-item-title"></span>
@@ -1276,20 +1806,34 @@ const lookupEntries = dictionary.entries.map((entry) => ({
                         <input
                             class="sense-gloss"
                             type="text"
-                            placeholder="例如：狗"
+                            placeholder="自动取第一个释义"
                         />
                     </label>
 
                 </div>
             `;
 
-            item.querySelector(
-                '.sense-definition'
-            ).value = definition;
 
-            item.querySelector(
-                '.sense-gloss'
-            ).value = gloss;
+            const definitionInput =
+                item.querySelector(
+                    '.sense-definition'
+                );
+
+            const glossInput =
+                item.querySelector(
+                    '.sense-gloss'
+                );
+
+
+            definitionInput.value =
+                definition;
+
+            glossInput.value =
+                gloss ||
+                makeGlossFromDefinition(
+                    definition
+                );
+
 
             senseList.appendChild(item);
 
@@ -1297,6 +1841,71 @@ const lookupEntries = dictionary.entries.map((entry) => ({
             update();
 
         }
+
+
+        /*
+         * 监听整个义项区域。
+         *
+         * 修改释义：
+         * 自动更新 Gloss。
+         *
+         * 用户亲自修改 Gloss：
+         * 停止自动覆盖该义项的 Gloss。
+         */
+        senseList.addEventListener(
+            'input',
+            (event) => {
+
+                const item =
+                    event.target.closest(
+                        '.sense-item'
+                    );
+
+                if (!item) return;
+
+
+                const definitionInput =
+                    item.querySelector(
+                        '.sense-definition'
+                    );
+
+                const glossInput =
+                    item.querySelector(
+                        '.sense-gloss'
+                    );
+
+
+                if (
+                    event.target ===
+                        definitionInput &&
+                    item.dataset.glossManual !==
+                        'true'
+                ) {
+
+                    glossInput.value =
+                        makeGlossFromDefinition(
+                            definitionInput.value
+                        );
+
+                }
+
+
+                if (
+                    event.target ===
+                        glossInput
+                ) {
+
+                    item.dataset.glossManual =
+                        'true';
+
+                }
+
+
+                update();
+
+            }
+        );
+
 
 
         /* =====================================
@@ -1315,6 +1924,7 @@ const lookupEntries = dictionary.entries.map((entry) => ({
                 .trim();
 
         }
+
 
 
         function getEntrySearchText(entry) {
@@ -1689,6 +2299,2114 @@ const lookupEntries = dictionary.entries.map((entry) => ({
 
 
         /* =====================================
+           Examples
+           ===================================== */
+
+
+        /*
+         * 从词典显示形式得到一个默认的句中形式。
+         *
+         * 例如：
+         * nu(-e) → nu
+         */
+        function makeSurfaceFromHeadword(value) {
+
+            return String(value)
+                .replace(/\([^)]*\)/g, '')
+                .trim();
+
+        }
+
+
+        /*
+         * 正在填写的新词条本身还没有进入
+         * dictionary.json。
+         *
+         * 但我们仍然希望给它写例句时，
+         * 能在例句搜索里找到它自己。
+         */
+        function getCurrentLookupEntry() {
+
+            const currentHeadword =
+                headword.value.trim();
+
+            const currentId =
+                idInput.value.trim();
+
+
+            if (
+                !currentHeadword &&
+                !currentId
+            ) {
+                return null;
+            }
+
+
+            const senses =
+                getSenses();
+
+
+            return {
+
+                id:
+                    currentId || '__current__',
+
+                headword:
+                    currentHeadword ||
+                    currentId,
+
+                pos:
+                    getSelectedPos(),
+
+                senses,
+
+                definitions:
+                    senses
+                        .map(
+                            (sense) =>
+                                sense.definition
+                        )
+                        .filter(Boolean),
+
+                glosses:
+                    senses
+                        .map(
+                            (sense) =>
+                                sense.gloss ||
+                                makeGlossFromDefinition(
+                                    sense.definition
+                                )
+                        )
+                        .filter(Boolean),
+
+                variants: [],
+
+                isCurrent: true,
+
+            };
+
+        }
+
+
+        /*
+         * 例句搜索使用：
+         *
+         * 1. 当前正在填写的新词
+         * 2. 已经存在于 dictionary.json 的词
+         */
+        function getExampleSearchPool() {
+
+            const current =
+                getCurrentLookupEntry();
+
+
+            if (!current) {
+                return existingEntries;
+            }
+
+
+            return [
+                current,
+                ...existingEntries,
+            ];
+
+        }
+
+
+        function refreshExampleNumbers() {
+
+            const examples =
+                Array.from(
+                    exampleList.querySelectorAll(
+                        '.example-item'
+                    )
+                );
+
+
+            examples.forEach(
+                (example, index) => {
+
+                    example.querySelector(
+                        '.example-title'
+                    ).textContent =
+                        `例句 ${index + 1}`;
+
+                }
+            );
+
+        }
+
+
+        function refreshExampleComponentNumbers(
+            example
+        ) {
+
+            const components =
+                Array.from(
+                    example.querySelectorAll(
+                        '.example-component'
+                    )
+                );
+
+
+            components.forEach(
+                (component, index) => {
+
+                    component.querySelector(
+                        '.example-component-title'
+                    ).textContent =
+                        `成分 ${index + 1}`;
+
+                }
+            );
+
+        }
+
+
+        /*
+         * 创建一个 <option>。
+         * 后面生成动词下拉框时重复使用。
+         */
+        function createOption(
+            value,
+            label
+        ) {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                value;
+
+            option.textContent =
+                label;
+
+            return option;
+
+        }
+
+
+        /*
+         * 给一个动词成分创建 6 个特征槽位。
+         *
+         * 每个槽位：
+         *
+         * [范畴] [具体值]
+         *
+         * 例如：
+         *
+         * [时]   [将来]
+         * [数]   [复数]
+         * [体]   [完成]
+         *
+         * 六个槽位互相独立，
+         * 空槽会被自动忽略。
+         */
+        function createVerbFeatureSlots(
+            component
+        ) {
+
+            const container =
+                component.querySelector(
+                    '.verb-feature-slots'
+                );
+
+
+            /*
+             * 防止重复生成。
+             */
+            container.innerHTML = '';
+
+
+            for (
+                let index = 0;
+                index < 6;
+                index += 1
+            ) {
+
+                const row =
+                    document.createElement(
+                        'div'
+                    );
+
+                row.className =
+                    'verb-feature-row';
+
+
+                /*
+                 * 左边显示：
+                 *
+                 * 特征 1
+                 * 特征 2
+                 * ...
+                 */
+                const number =
+                    document.createElement(
+                        'span'
+                    );
+
+                number.className =
+                    'feature-number';
+
+                number.textContent =
+                    `特征 ${index + 1}`;
+
+
+                /*
+                 * 第一列：
+                 * 选择范畴。
+                 */
+                const kindSelect =
+                    document.createElement(
+                        'select'
+                    );
+
+                kindSelect.className =
+                    'verb-feature-kind';
+
+
+                kindSelect.appendChild(
+                    createOption(
+                        '',
+                        '不选择'
+                    )
+                );
+
+
+                Object.entries(
+                    VERB_FEATURES
+                ).forEach(
+                    ([value, info]) => {
+
+                        kindSelect.appendChild(
+                            createOption(
+                                value,
+                                info.label
+                            )
+                        );
+
+                    }
+                );
+
+
+                /*
+                 * 第二列：
+                 * 选择这个范畴的具体值。
+                 *
+                 * 没有选择范畴之前，
+                 * 这里先禁用。
+                 */
+                const valueSelect =
+                    document.createElement(
+                        'select'
+                    );
+
+                valueSelect.className =
+                    'verb-feature-value';
+
+                valueSelect.disabled =
+                    true;
+
+
+                valueSelect.appendChild(
+                    createOption(
+                        '',
+                        '—'
+                    )
+                );
+
+
+                row.append(
+                    number,
+                    kindSelect,
+                    valueSelect
+                );
+
+
+                container.appendChild(
+                    row
+                );
+
+            }
+
+        }
+
+
+        /*
+         * 用户选定一个动词范畴之后，
+         * 根据范畴生成右边的可选值。
+         *
+         * 例如：
+         *
+         * 时
+         * → 现在 / 过去 / 将来
+         *
+         * 语态
+         * → 主动 / 被动 / 使动
+         */
+        function populateVerbFeatureValues(
+            kindSelect
+        ) {
+
+            const row =
+                kindSelect.closest(
+                    '.verb-feature-row'
+                );
+
+
+            const valueSelect =
+                row.querySelector(
+                    '.verb-feature-value'
+                );
+
+
+            valueSelect.innerHTML =
+                '';
+
+
+            const kind =
+                kindSelect.value;
+
+
+            /*
+             * 范畴为空：
+             * 右边也清空并禁用。
+             */
+            if (!kind) {
+
+                valueSelect.disabled =
+                    true;
+
+
+                valueSelect.appendChild(
+                    createOption(
+                        '',
+                        '—'
+                    )
+                );
+
+
+                return;
+
+            }
+
+
+            valueSelect.disabled =
+                false;
+
+
+            valueSelect.appendChild(
+                createOption(
+                    '',
+                    '不选择'
+                )
+            );
+
+
+            const feature =
+                VERB_FEATURES[kind];
+
+
+            feature.values.forEach(
+                (valueInfo) => {
+
+                    const option =
+                        createOption(
+                            valueInfo.value,
+                            valueInfo.label
+                        );
+
+
+                    /*
+                     * 真正生成 Gloss 时，
+                     * 使用 data-gloss。
+                     *
+                     * 比如：
+                     *
+                     * UI 显示：将来
+                     * Gloss 使用：将来时
+                     */
+                    option.dataset.gloss =
+                        valueInfo.gloss;
+
+
+                    valueSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        /*
+         * 给义项选择框填内容。
+         *
+         * 如果一个词只有一个义项，
+         * 就只有一个选项。
+         *
+         * 如果有多个义项，
+         * 用户可以明确选择该例句使用哪个。
+         */
+        function populateExampleSenseSelect(
+            component,
+            entry
+        ) {
+
+            const select =
+                component.querySelector(
+                    '.example-sense'
+                );
+
+
+            select.innerHTML = '';
+
+
+            const senses =
+                entry.senses ?? [];
+
+
+            if (senses.length === 0) {
+
+                const option =
+                    document.createElement(
+                        'option'
+                    );
+
+                option.value = '0';
+                option.textContent =
+                    '没有可用义项';
+
+                select.appendChild(
+                    option
+                );
+
+                select.disabled =
+                    true;
+
+                return;
+
+            }
+
+
+            select.disabled =
+                false;
+
+
+            senses.forEach(
+                (sense, index) => {
+
+                    const option =
+                        document.createElement(
+                            'option'
+                        );
+
+                    option.value =
+                        String(index);
+
+
+                    const text =
+                        sense.definition ||
+                        sense.gloss ||
+                        `义项 ${index + 1}`;
+
+
+                    option.textContent =
+                        `${index + 1}. ${text}`;
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+        }
+
+
+        function setExampleWordStatus(
+            component,
+            message,
+            state = ''
+        ) {
+
+            const statusElement =
+                component.querySelector(
+                    '.example-word-status'
+                );
+
+
+            statusElement.className =
+                `example-word-status ${state}`;
+
+
+            statusElement.textContent =
+                message;
+
+        }
+
+
+        /*
+         * 用户点击某个搜索结果之后，
+         * 真正选中这个词条。
+         */
+        function selectExampleEntry(
+            component,
+            entry
+        ) {
+
+            /*
+             * 保存真正的稳定 ID。
+             */
+            component.dataset.ref =
+                entry.id;
+
+
+            /*
+             * 标记它是不是当前正在创建的新词。
+             */
+            component.dataset.current =
+                entry.isCurrent
+                    ? 'true'
+                    : 'false';
+
+
+            const searchInput =
+                component.querySelector(
+                    '.example-search'
+                );
+
+            const surfaceInput =
+                component.querySelector(
+                    '.example-surface'
+                );
+
+
+            /*
+             * 搜索框显示 headword，
+             * 但程序内部保存的是 ID。
+             */
+            searchInput.value =
+                entry.headword;
+
+
+            /*
+             * 默认给出句中形式。
+             *
+             * nu(-e) 会自动成为 nu。
+             *
+             * 用户之后仍然可以手动改成
+             * 真正的变格 / 变位形式。
+             */
+            surfaceInput.value =
+                makeSurfaceFromHeadword(
+                    entry.headword
+                );
+
+
+            populateExampleSenseSelect(
+                component,
+                entry
+            );
+
+
+            setExampleWordStatus(
+                component,
+
+                entry.isCurrent
+                    ? `✓ 当前词条 · ID: ${entry.id}`
+                    : `✓ 已选择 ID: ${entry.id}`,
+
+                'valid'
+            );
+
+
+            component.querySelector(
+                '.example-search-results'
+            ).hidden = true;
+
+
+            update();
+
+        }
+
+
+        /*
+         * 根据搜索框内容显示候选词。
+         */
+        function renderExampleSearchResults(
+            component,
+            rawQuery
+        ) {
+
+            const resultBox =
+                component.querySelector(
+                    '.example-search-results'
+                );
+
+
+            resultBox.innerHTML = '';
+
+
+            const query =
+                normalizeSearch(
+                    rawQuery
+                );
+
+
+            if (!query) {
+
+                resultBox.hidden =
+                    true;
+
+                return;
+
+            }
+
+
+            const matches =
+                getExampleSearchPool()
+
+                    .filter(
+                        (entry) =>
+                            getEntrySearchText(
+                                entry
+                            ).includes(query)
+                    )
+
+                    .slice(0, 8);
+
+
+            matches.forEach(
+                (entry) => {
+
+                    const button =
+                        document.createElement(
+                            'button'
+                        );
+
+
+                    button.type =
+                        'button';
+
+                    button.className =
+                        'example-search-result';
+
+
+                    const title =
+                        document.createElement(
+                            'span'
+                        );
+
+                    title.style.fontWeight =
+                        '650';
+
+                    title.textContent =
+                        entry.headword;
+
+
+                    const id =
+                        document.createElement(
+                            'span'
+                        );
+
+                    id.style.marginLeft =
+                        '0.5rem';
+
+                    id.style.opacity =
+                        '0.65';
+
+                    id.style.fontSize =
+                        '0.74rem';
+
+
+                    id.textContent =
+                        entry.isCurrent
+                            ? `当前词条 · ${entry.id}`
+                            : `ID: ${entry.id}`;
+
+
+                    button.append(
+                        title,
+                        id
+                    );
+
+
+                    if (
+                        entry.definitions?.[0]
+                    ) {
+
+                        const description =
+                            document.createElement(
+                                'span'
+                            );
+
+                        description.style.display =
+                            'block';
+
+                        description.style.marginTop =
+                            '0.15rem';
+
+                        description.style.opacity =
+                            '0.7';
+
+                        description.style.fontSize =
+                            '0.74rem';
+
+                        description.textContent =
+                            entry.definitions[0];
+
+
+                        button.appendChild(
+                            description
+                        );
+
+                    }
+
+
+                    button.addEventListener(
+                        'click',
+                        () => {
+
+                            selectExampleEntry(
+                                component,
+                                entry
+                            );
+
+                        }
+                    );
+
+
+                    resultBox.appendChild(
+                        button
+                    );
+
+                }
+            );
+
+
+            resultBox.hidden =
+                resultBox.children.length === 0;
+
+        }
+
+
+        /*
+         * 根据一个成分保存的 ID，
+         * 找回完整词条。
+         */
+        function getSelectedExampleEntry(
+            component
+        ) {
+
+            if (
+                component.dataset.current ===
+                'true'
+            ) {
+
+                return getCurrentLookupEntry();
+
+            }
+
+
+            const ref =
+                component.dataset.ref;
+
+
+            if (!ref) {
+                return null;
+            }
+
+
+            return existingEntries.find(
+                (entry) =>
+                    entry.id === ref
+            ) ?? null;
+
+        }
+
+
+        /*
+         * 得到这个成分的纯词汇 Gloss。
+         *
+         * 现在还不添加：
+         * 格、数、时、体等语法信息。
+         */
+        function getExampleLexicalGloss(
+            component
+        ) {
+
+            const entry =
+                getSelectedExampleEntry(
+                    component
+                );
+
+
+            if (!entry) {
+                return '?';
+            }
+
+
+            const senseSelect =
+                component.querySelector(
+                    '.example-sense'
+                );
+
+
+            const senseIndex =
+                Number(
+                    senseSelect.value || 0
+                );
+
+
+            const sense =
+                entry.senses?.[senseIndex] ??
+                entry.senses?.[0];
+
+
+            if (!sense) {
+                return '?';
+            }
+
+
+            if (
+                sense.gloss?.trim()
+            ) {
+
+                return sense.gloss.trim();
+
+            }
+
+
+            return (
+                makeGlossFromDefinition(
+                    sense.definition
+                ) || '?'
+            );
+
+        }
+
+
+
+
+
+        /*
+         * 读取变格成分的语法信息。
+         *
+         * 例如：
+         *
+         * 数 = 复数
+         * 格 = 方位
+         *
+         * →
+         *
+         * ["复数", "方位"]
+         */
+        function getNominalFeatureGlosses(
+            component
+        ) {
+
+            const result = [];
+
+
+            const number =
+                component.querySelector(
+                    '.nominal-number'
+                ).value;
+
+
+            const grammaticalCase =
+                component.querySelector(
+                    '.nominal-case'
+                ).value;
+
+
+            if (number) {
+
+                result.push(
+                    number
+                );
+
+            }
+
+
+            if (grammaticalCase) {
+
+                result.push(
+                    grammaticalCase
+                );
+
+            }
+
+
+            return result;
+
+        }
+
+
+        /*
+         * 读取动词的 6 个特征槽位。
+         *
+         * 空槽自动忽略。
+         */
+        function getVerbFeatureGlosses(
+            component
+        ) {
+
+            const result = [];
+
+
+            const rows =
+                component.querySelectorAll(
+                    '.verb-feature-row'
+                );
+
+
+            rows.forEach(
+                (row) => {
+
+                    const kind =
+                        row.querySelector(
+                            '.verb-feature-kind'
+                        ).value;
+
+
+                    const valueSelect =
+                        row.querySelector(
+                            '.verb-feature-value'
+                        );
+
+
+                    const value =
+                        valueSelect.value;
+
+
+                    /*
+                     * 范畴或者值有一个没选，
+                     * 就直接忽略这个槽位。
+                     */
+                    if (
+                        !kind ||
+                        !value
+                    ) {
+                        return;
+                    }
+
+
+                    const option =
+                        valueSelect
+                            .selectedOptions[0];
+
+
+                    const gloss =
+                        option?.dataset.gloss;
+
+
+                    if (gloss) {
+
+                        result.push(
+                            gloss
+                        );
+
+                    }
+
+                }
+            );
+
+
+            return result;
+
+        }
+
+
+
+
+
+
+        /*
+         * 生成一个完整成分的 Gloss。
+         *
+         * 第一步：
+         * 从词典得到 lexical gloss。
+         *
+         * 第二步：
+         * 根据成分类型追加语法特征。
+         */
+        function getMorphFeatureGlosses(
+            component
+        ) {
+
+            const value =
+                component.querySelector(
+                    '.morph-feature'
+                ).value;
+
+
+            if (!value) {
+                return [];
+            }
+
+
+            return [
+                value
+            ];
+
+        }
+        function buildExampleComponentGloss(
+            component
+        ) {
+
+            const lexicalGloss =
+                getExampleLexicalGloss(
+                    component
+                );
+
+
+            const type =
+                component.querySelector(
+                    '.example-component-type'
+                ).value;
+
+
+            let features = [];
+
+
+            if (type === 'nominal') {
+
+                features =
+                    getNominalFeatureGlosses(
+                        component
+                    );
+
+            }
+
+
+            if (type === 'verb') {
+
+                features =
+                    getVerbFeatureGlosses(
+                        component
+                    );
+
+            }
+
+
+            if (type === 'morph') {
+
+                features =
+                    getMorphFeatureGlosses(
+                        component
+                    );
+
+            }
+
+            return [
+                lexicalGloss,
+                ...features,
+            ]
+                .filter(Boolean)
+                .join('-');
+
+        }
+
+        /*
+         * 刷新一个例句最下面的
+         * 自动原文和自动 Gloss。
+         */
+        function refreshExamplePreview(
+            example
+        ) {
+
+            const components =
+                Array.from(
+                    example.querySelectorAll(
+                        '.example-component'
+                    )
+                );
+
+
+            const sourceParts = [];
+            const glossParts = [];
+
+
+            components.forEach(
+                (component) => {
+
+                    const surface =
+                        component.querySelector(
+                            '.example-surface'
+                        ).value.trim();
+
+
+                    const ref =
+                        component.dataset.ref;
+
+
+                    /*
+                    * 完全空白的成分直接忽略。
+                    */
+                    if (
+                        !surface &&
+                        !ref
+                    ) {
+                        return;
+                    }
+
+
+                    sourceParts.push(
+                        surface || '?'
+                    );
+
+
+                    glossParts.push(
+                        buildExampleComponentGloss(
+                            component
+                        )
+                    );
+
+                }
+            );
+
+
+            /*
+            * 原文始终由各成分自动生成。
+            */
+            example.querySelector(
+                '.example-source-preview'
+            ).value =
+                sourceParts.join(
+                    ' | '
+                );
+
+
+            /*
+            * Gloss 默认自动生成。
+            *
+            * 但是一旦用户手动修改过 Gloss，
+            * 就不再覆盖用户的版本。
+            */
+            if (
+                example.dataset.glossManual !==
+                'true'
+            ) {
+
+                example.querySelector(
+                    '.example-gloss-preview'
+                ).value =
+                    glossParts.join(
+                        ' | '
+                    );
+
+            }
+
+        }
+
+
+        function refreshAllExamplePreviews() {
+
+            exampleList
+                .querySelectorAll(
+                    '.example-item'
+                )
+                .forEach(
+                    (example) => {
+
+                        refreshExamplePreview(
+                            example
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /*
+         * 目前成分类型只有三个。
+         *
+         * 普通：
+         * 不显示语法特征。
+         *
+         * 变格成分：
+         * 下一轮加入数 + 格。
+         *
+         * 动词类：
+         * 下一轮加入 6 个特征槽位。
+         */
+        function updateExampleTypeDisplay(
+    component
+) {
+
+    const typeSelect =
+        component.querySelector(
+            '.example-component-type'
+        );
+
+    const nominalArea =
+        component.querySelector(
+            '.nominal-features'
+        );
+
+    const verbArea =
+        component.querySelector(
+            '.verb-features'
+        );
+
+    const morphArea =
+        component.querySelector(
+            '.morph-features'
+        );
+
+
+    const type =
+        typeSelect.value;
+
+
+    nominalArea.hidden =
+        type !== 'nominal';
+
+    verbArea.hidden =
+        type !== 'verb';
+
+    morphArea.hidden =
+        type !== 'morph';
+
+}
+
+
+        /*
+         * 给某个例句增加一个成分。
+         */
+        function addExampleComponent(
+            example
+        ) {
+
+            const componentList =
+                example.querySelector(
+                    '.example-components'
+                );
+
+
+            const component =
+                document.createElement(
+                    'div'
+                );
+
+
+            component.className =
+                'example-component';
+
+
+            component.dataset.ref =
+                '';
+
+            component.dataset.current =
+                'false';
+
+
+            component.innerHTML = `
+
+                <div class="dynamic-item-header">
+
+                    <span
+                        class="
+                            dynamic-item-title
+                            example-component-title
+                        "
+                    >
+                        成分
+                    </span>
+
+
+                    <button
+                        type="button"
+                        class="
+                            delete-button
+                            delete-example-component
+                        "
+                    >
+                        删除
+                    </button>
+
+                </div>
+
+
+                <div class="example-component-main">
+
+
+                    <div
+                        class="
+                            field
+                            example-picker
+                        "
+                    >
+
+                        <span class="field-label">
+                            词典词条
+                        </span>
+
+
+                        <input
+                            type="text"
+                            class="example-search"
+                            autocomplete="off"
+                            placeholder="搜索词形、ID 或释义……"
+                        />
+
+
+                        <select
+                            class="example-sense"
+                            disabled
+                        >
+                            <option>
+                                尚未选择词条
+                            </option>
+                        </select>
+
+
+                        <span
+                            class="example-word-status"
+                        >
+                            尚未选择词条。
+                        </span>
+
+
+                        <div
+                            class="example-search-results"
+                            hidden
+                        ></div>
+
+                    </div>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            句中形式
+                        </span>
+
+
+                        <input
+                            type="text"
+                            class="example-surface"
+                            placeholder="实际出现在句中的形式"
+                        />
+
+                    </label>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            成分类型
+                        </span>
+
+
+                        <select
+                            class="example-component-type"
+                        >
+
+                            <option value="plain">
+                                普通
+                            </option>
+
+                            <option value="nominal">
+                                变格成分
+                            </option>
+
+                            <option value="verb">
+                                动词类
+                            </option>
+
+                            <option value="morph">
+                                构形
+                            </option>
+
+                        </select>
+
+                    </label>
+
+                </div>
+
+
+                <div
+                    class="example-feature-area"
+                >
+
+
+                    <div
+                        class="nominal-features"
+                        hidden>
+
+                        <label class="field">
+
+                            <span class="field-label">
+                                数
+                            </span>
+
+                            <select
+                                class="nominal-number"
+                            >
+
+                                <option value="">
+                                    不选择
+                                </option>
+
+                                <option value="单数">
+                                    单数
+                                </option>
+
+                                <option value="复数">
+                                    复数
+                                </option>
+
+                                <option value="不可数">
+                                    不可数
+                                </option>
+
+                            </select>
+
+                        </label>
+
+
+                        <label class="field">
+
+                            <span class="field-label">
+                                格
+                            </span>
+
+                            <select
+                                class="nominal-case"
+                            >
+
+                                <option value="">
+                                    不选择
+                                </option>
+
+                                <option value="施事">
+                                    施事
+                                </option>
+
+                                <option value="客体">
+                                    客体
+                                </option>
+
+                                <option value="承受">
+                                    承受
+                                </option>
+
+                                <option value="使成">
+                                    使成
+                                </option>
+
+                                <option value="受益">
+                                    受益
+                                </option>
+
+                                <option value="目的">
+                                    目的
+                                </option>
+
+                                <option value="源点">
+                                    源点
+                                </option>
+
+                                <option value="方位">
+                                    方位
+                                </option>
+
+                                <option value="工具">
+                                    工具
+                                </option>
+
+                                <option value="伴随">
+                                    伴随
+                                </option>
+
+                            </select>
+
+                        </label>
+
+                    </div>
+
+
+                    <div
+                        class="verb-features"
+                        hidden
+                    >
+
+                        <div
+                            class="verb-feature-slots"
+                        ></div>
+
+                    </div>
+
+                    <div
+                        class="morph-features"
+                        hidden
+                    >
+
+                        <label class="field">
+
+                            <span class="field-label">
+                                构形类型
+                            </span>
+
+                            <select
+                                class="morph-feature"
+                            >
+
+                                <option value="">
+                                    不选择
+                                </option>
+
+                                <option value="构建态">
+                                    构建态
+                                </option>
+
+                                <option value="副动词">
+                                    副动词
+                                </option>
+
+                                <option value="动名词">
+                                    动名词
+                                </option>
+
+                            </select>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            componentList.appendChild(
+                component
+            );
+            createVerbFeatureSlots(
+                component
+            );
+
+            refreshExampleComponentNumbers(
+                example
+            );
+
+
+            updateExampleTypeDisplay(
+                component
+            );
+
+
+            update();
+
+        }
+
+
+        /*
+         * 增加整个例句。
+         */
+        function addExample() {
+
+            const example =
+                document.createElement(
+                    'div'
+                );
+
+
+            example.className =
+                'example-item';
+            
+            example.dataset.glossManual =
+                'false';
+
+
+            example.innerHTML = `
+
+                <div class="dynamic-item-header">
+
+                    <strong class="example-title">
+                        例句
+                    </strong>
+
+
+                    <button
+                        type="button"
+                        class="
+                            delete-button
+                            delete-example
+                        "
+                    >
+                        删除例句
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="example-components"
+                ></div>
+
+
+                <div class="example-actions">
+
+                    <button
+                        type="button"
+                        class="
+                            small-button
+                            add-example-component
+                        "
+                    >
+                        ＋ 添加成分
+                    </button>
+
+                </div>
+
+
+                <div class="example-preview">
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            自动原文
+                        </span>
+
+
+                        <textarea
+                            class="
+                                example-source-preview
+                            "
+                            rows="2"
+                            readonly
+                        ></textarea>
+
+                    </label>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            Gloss
+                        </span>
+
+
+                        <textarea
+                            class="
+                                example-gloss-preview
+                            "
+                            rows="2"
+                            placeholder="默认自动生成，也可以手动修改"
+                        ></textarea>
+
+
+                        <span class="field-help">
+                            默认根据词义和语法特征自动生成；
+                            手动修改后将保留你的版本。
+                        </span>
+
+                    </label>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            翻译
+                        </span>
+
+
+                        <textarea
+                            class="
+                                example-translation
+                            "
+                            rows="2"
+                            placeholder="可留空"
+                        ></textarea>
+
+                    </label>
+
+
+                </div>
+
+            `;
+
+
+            exampleList.appendChild(
+                example
+            );
+
+
+            refreshExampleNumbers();
+
+            update();
+
+        }
+
+
+        /*
+         * 点击“添加例句”
+         */
+        addExampleButton.addEventListener(
+            'click',
+            () => {
+
+                addExample();
+
+            }
+        );
+
+
+        /*
+         * Example 区域里的按钮。
+         */
+        exampleList.addEventListener(
+            'click',
+            (event) => {
+
+
+                /*
+                 * 添加成分
+                 */
+                const addComponentButton =
+                    event.target.closest(
+                        '.add-example-component'
+                    );
+
+
+                if (addComponentButton) {
+
+                    const example =
+                        addComponentButton.closest(
+                            '.example-item'
+                        );
+
+
+                    if (example) {
+
+                        addExampleComponent(
+                            example
+                        );
+
+                    }
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * 删除成分
+                 */
+                const deleteComponentButton =
+                    event.target.closest(
+                        '.delete-example-component'
+                    );
+
+
+                if (deleteComponentButton) {
+
+                    const component =
+                        deleteComponentButton.closest(
+                            '.example-component'
+                        );
+
+                    const example =
+                        deleteComponentButton.closest(
+                            '.example-item'
+                        );
+
+
+                    component?.remove();
+
+
+                    if (example) {
+
+                        refreshExampleComponentNumbers(
+                            example
+                        );
+
+                    }
+
+
+                    update();
+
+                    return;
+
+                }
+
+
+                /*
+                 * 删除例句
+                 */
+                const deleteExampleButton =
+                    event.target.closest(
+                        '.delete-example'
+                    );
+
+
+                if (deleteExampleButton) {
+
+                    const example =
+                        deleteExampleButton.closest(
+                            '.example-item'
+                        );
+
+
+                    example?.remove();
+
+
+                    refreshExampleNumbers();
+
+                    update();
+
+                }
+
+            }
+        );
+
+
+        /*
+         * 搜索框、句中形式等输入改变。
+         */
+        exampleList.addEventListener(
+            'input',
+            (event) => {
+
+
+                /*
+                * 搜索词典词条
+                */
+                const searchInput =
+                    event.target.closest(
+                        '.example-search'
+                    );
+
+
+                if (searchInput) {
+
+                    const component =
+                        searchInput.closest(
+                            '.example-component'
+                        );
+
+
+                    component.dataset.ref =
+                        '';
+
+                    component.dataset.current =
+                        'false';
+
+
+                    setExampleWordStatus(
+                        component,
+                        '尚未确认词条。'
+                    );
+
+
+                    renderExampleSearchResults(
+                        component,
+                        searchInput.value
+                    );
+
+                }
+
+
+                /*
+                * 用户亲自修改 Gloss。
+                *
+                * 从这一刻开始，
+                * 程序不再自动覆盖这个例句的 Gloss。
+                */
+                const glossInput =
+                    event.target.closest(
+                        '.example-gloss-preview'
+                    );
+
+
+                if (glossInput) {
+
+                    const example =
+                        glossInput.closest(
+                            '.example-item'
+                        );
+
+
+                    if (example) {
+
+                        example.dataset.glossManual =
+                            'true';
+
+                    }
+
+                }
+
+
+                update();
+
+            }
+        );
+
+
+        /*
+         * 下拉选项发生变化。
+         */
+        exampleList.addEventListener(
+            'change',
+            (event) => {
+
+
+                const component =
+                    event.target.closest(
+                        '.example-component'
+                    );
+
+
+                if (component) {
+
+
+                    /*
+                     * 普通 / 变格成分 / 动词类
+                     */
+                    if (
+                        event.target.matches(
+                            '.example-component-type'
+                        )
+                    ) {
+
+                        updateExampleTypeDisplay(
+                            component
+                        );
+
+                    }
+
+
+                    /*
+                     * 动词某一个槽位选择了：
+                     *
+                     * 时 / 体 / 语态 / 人称 /
+                     * 数 / 语气
+                     *
+                     * 那么重新生成该槽位右边的值。
+                     */
+                    if (
+                        event.target.matches(
+                            '.verb-feature-kind'
+                        )
+                    ) {
+
+                        populateVerbFeatureValues(
+                            event.target
+                        );
+
+                    }
+
+                }
+
+
+                update();
+
+            }
+        );      
+
+
+
+
+         /*
+         * 把页面中的全部例句整理成
+         * dictionary.json 所需要的格式。
+         */
+        function getExamples() {
+
+            return Array.from(
+                exampleList.querySelectorAll(
+                    '.example-item'
+                )
+            )
+
+            .map(
+                (example) => {
+
+                    const source =
+                        example.querySelector(
+                            '.example-source-preview'
+                        ).value.trim();
+
+
+                    const gloss =
+                        example.querySelector(
+                            '.example-gloss-preview'
+                        ).value.trim();
+
+
+                    const translation =
+                        example.querySelector(
+                            '.example-translation'
+                        ).value.trim();
+
+
+                    /*
+                     * 一个完全没有填写内容的例句
+                     * 不写进 JSON。
+                     */
+                    const hasComponents =
+                        example.querySelectorAll(
+                            '.example-component'
+                        ).length > 0;
+
+
+                    if (
+                        !source &&
+                        !gloss &&
+                        !translation &&
+                        !hasComponents
+                    ) {
+
+                        return null;
+
+                    }
+
+
+                    const result = {
+
+                        source,
+                        gloss,
+
+                    };
+
+
+                    /*
+                     * translation 是可选字段。
+                     *
+                     * 这样例词可以只保存：
+                     *
+                     * source + gloss
+                     */
+                    if (translation) {
+
+                        result.translation =
+                            translation;
+
+                    }
+
+
+                    return result;
+
+                }
+            )
+
+            .filter(Boolean);
+
+        }
+
+        /* =====================================
            Build JSON
            ===================================== */
 
@@ -1850,7 +4568,7 @@ const lookupEntries = dictionary.entries.map((entry) => ({
                     derived: []
                 },
 
-                examples: [],
+                examples: getExamples(),
 
                 status:
                     status.value,
@@ -1960,6 +4678,79 @@ const lookupEntries = dictionary.entries.map((entry) => ({
                     }
                 );
 
+             /*
+             * Examples
+             */
+            entry.examples.forEach(
+                (example, index) => {
+
+                    if (!example.source) {
+
+                        errors.push(
+                            `例句 ${index + 1} ` +
+                            `缺少原文。`
+                        );
+
+                    }
+
+
+                    if (!example.gloss) {
+
+                        errors.push(
+                            `例句 ${index + 1} ` +
+                            `缺少 Gloss。`
+                        );
+
+                    }
+
+
+                    /*
+                     * 有原文和 Gloss 时，
+                     * 检查 "|" 分组数量是否一致。
+                     */
+                    if (
+                        example.source &&
+                        example.gloss
+                    ) {
+
+                        const sourceParts =
+                            example.source
+                                .split('|')
+                                .map(
+                                    (part) =>
+                                        part.trim()
+                                );
+
+
+                        const glossParts =
+                            example.gloss
+                                .split('|')
+                                .map(
+                                    (part) =>
+                                        part.trim()
+                                );
+
+
+                        if (
+                            sourceParts.length !==
+                            glossParts.length
+                        ) {
+
+                            errors.push(
+                                `例句 ${index + 1}：` +
+                                `原文有 ` +
+                                `${sourceParts.length} 个成分，` +
+                                `Gloss 有 ` +
+                                `${glossParts.length} 个成分。`
+                            );
+
+                        }
+
+                    }
+
+                }
+            );
+
 
             return errors;
 
@@ -1967,6 +4758,8 @@ const lookupEntries = dictionary.entries.map((entry) => ({
 
 
         function update() {
+
+            refreshAllExamplePreviews();
 
             const entry =
                 buildEntry();
