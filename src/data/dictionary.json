@@ -614,6 +614,136 @@
   "status": "established",
   "tags": [],
   "notes": ""
+},
+{
+  "id": "wula",
+  "headword": "wula",
+  "type": "word",
+  "pos": [
+    "verb"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "浸泡，蘸，用水泡",
+      "gloss": "泡"
+    },
+    {
+      "definition": "烹煮，煮，泡煮",
+      "gloss": "煮"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
+},
+{
+  "id": "burwelne",
+  "headword": "burwelne",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "故乡，家乡"
+    },
+    {
+      "definition": "原产地"
+    }
+  ],
+  "formation": {
+    "type": "derived",
+    "analysis": "bur-welne",
+    "components": [
+      {
+        "ref": "bur-",
+        "form": "bur-"
+      },
+      {
+        "ref": "welne",
+        "form": "welne"
+      }
+    ]
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
+},
+{
+  "id": "matacce",
+  "headword": "matacce",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "大都市",
+      "gloss": "大都市"
+    },
+    {
+      "definition": "首都",
+      "gloss": "首都"
+    }
+  ],
+  "formation": {
+    "type": "derived",
+    "analysis": "ma-tacce",
+    "components": [
+      {
+        "ref": "ma-",
+        "form": "ma-"
+      },
+      {
+        "ref": "tacce",
+        "form": "tacce"
+      }
+    ]
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
 }
     
   ]

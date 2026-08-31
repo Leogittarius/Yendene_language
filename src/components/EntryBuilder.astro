@@ -1,6 +1,26 @@
+---
+import dictionary from '@data/dictionary.json';
+
+const lookupEntries = dictionary.entries.map((entry) => ({
+    id: entry.id,
+    headword: entry.headword,
+    pos: entry.pos ?? [],
+    definitions: (entry.senses ?? [])
+        .map((sense) => sense.definition)
+        .filter(Boolean),
+    glosses: (entry.senses ?? [])
+        .map((sense) => sense.gloss)
+        .filter(Boolean),
+}));
+---
+
 <div class="entry-builder">
 
     <div class="builder-form">
+
+        <!-- =====================================
+             Basic information
+             ===================================== -->
 
         <section class="builder-section">
             <h2>基本信息</h2>
@@ -35,7 +55,10 @@
                     </button>
                 </div>
 
-                <span class="field-help">
+                <span
+                    id="eb-id-message"
+                    class="field-help"
+                >
                     根据词头自动建议，可手动修改。
                 </span>
             </div>
@@ -45,11 +68,25 @@
                 <span class="field-label">条目类型</span>
 
                 <select id="eb-type">
-                    <option value="word">word — 词</option>
-                    <option value="affix">affix — 词缀</option>
-                    <option value="root">root — 词根</option>
-                    <option value="clitic">clitic — 附着词</option>
-                    <option value="phrase">phrase — 短语</option>
+                    <option value="word">
+                        word — 词
+                    </option>
+
+                    <option value="affix">
+                        affix — 词缀
+                    </option>
+
+                    <option value="root">
+                        root — 词根
+                    </option>
+
+                    <option value="clitic">
+                        clitic — 附着词
+                    </option>
+
+                    <option value="phrase">
+                        phrase — 短语
+                    </option>
                 </select>
             </label>
 
@@ -60,92 +97,52 @@
                 <div class="checkbox-grid">
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="noun"
-                        />
+                        <input type="checkbox" name="pos" value="noun" />
                         <span>n. 普通名词</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="verb"
-                        />
+                        <input type="checkbox" name="pos" value="verb" />
                         <span>v. 普通动态动词</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="stative"
-                        />
+                        <input type="checkbox" name="pos" value="stative" />
                         <span>stat. 状态动词</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="numeral"
-                        />
+                        <input type="checkbox" name="pos" value="numeral" />
                         <span>num. 数量状态动词</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="pronoun"
-                        />
+                        <input type="checkbox" name="pos" value="pronoun" />
                         <span>pron. 代词</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="function"
-                        />
+                        <input type="checkbox" name="pos" value="function" />
                         <span>func. 普通功能词</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="lightverb"
-                        />
+                        <input type="checkbox" name="pos" value="lightverb" />
                         <span>lv. 轻动词</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="particle"
-                        />
+                        <input type="checkbox" name="pos" value="particle" />
                         <span>part. 构式粒子</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="affix"
-                        />
+                        <input type="checkbox" name="pos" value="affix" />
                         <span>aff. 普通派生词缀</span>
                     </label>
 
                     <label>
-                        <input
-                            type="checkbox"
-                            name="pos"
-                            value="converb"
-                        />
+                        <input type="checkbox" name="pos" value="converb" />
                         <span>conv. 副动词后缀</span>
                     </label>
 
@@ -170,38 +167,33 @@
                     </option>
                 </select>
             </label>
-
         </section>
 
+
+        <!-- =====================================
+             Senses
+             ===================================== -->
 
         <section class="builder-section">
-            <h2>释义</h2>
+            <div class="section-header">
+                <h2>义项</h2>
 
-            <label class="field">
-                <span class="field-label">释义</span>
+                <button
+                    id="eb-add-sense"
+                    class="small-button"
+                    type="button"
+                >
+                    ＋ 添加义项
+                </button>
+            </div>
 
-                <textarea
-                    id="eb-definition"
-                    rows="3"
-                    placeholder="例如：狗，犬"
-                ></textarea>
-            </label>
-
-            <label class="field">
-                <span class="field-label">Gloss</span>
-
-                <input
-                    id="eb-gloss"
-                    type="text"
-                    placeholder="例如：狗"
-                />
-
-                <span class="field-help">
-                    用于逐词分析，可暂时留空。
-                </span>
-            </label>
+            <div id="eb-sense-list"></div>
         </section>
 
+
+        <!-- =====================================
+             Formation
+             ===================================== -->
 
         <section class="builder-section">
             <h2>构词</h2>
@@ -255,12 +247,44 @@
                 />
 
                 <span class="field-help">
-                    这里只填写显示用的 analysis。
-                    components 下一版加入。
+                    analysis 只是显示用字符串，不参与词条引用。
                 </span>
             </label>
+
+
+            <div
+                id="eb-component-block"
+                class="component-block"
+            >
+                <div class="section-header component-header">
+                    <div>
+                        <span class="field-label">
+                            构词成分
+                        </span>
+
+                        <span class="field-help">
+                            ref 默认使用词条的 ID，而不是显示词形。
+                            可以搜索现有词条，也可以建立暂未收录的 ID。
+                        </span>
+                    </div>
+
+                    <button
+                        id="eb-add-component"
+                        class="small-button"
+                        type="button"
+                    >
+                        ＋ 添加成分
+                    </button>
+                </div>
+
+                <div id="eb-component-list"></div>
+            </div>
         </section>
 
+
+        <!-- =====================================
+             Other
+             ===================================== -->
 
         <section class="builder-section">
             <h2>其他</h2>
@@ -299,6 +323,10 @@
     </div>
 
 
+    <!-- =====================================
+         Output
+         ===================================== -->
+
     <aside class="builder-output">
 
         <div class="output-header">
@@ -307,8 +335,8 @@
                 <h2>生成结果</h2>
 
                 <p>
-                    生成的是单个词条对象，
-                    可以直接复制到 entries 数组中。
+                    生成单个词条对象，可直接加入
+                    dictionary.json 的 entries 数组。
                 </p>
             </div>
 
@@ -323,12 +351,10 @@
 
         </div>
 
-
         <div
             id="eb-validation"
             class="validation"
         ></div>
-
 
         <textarea
             id="eb-output"
@@ -342,30 +368,33 @@
 </div>
 
 
+<script
+    id="eb-existing-entries"
+    type="application/json"
+    set:html={JSON.stringify(lookupEntries)}
+></script>
+
+
 <style>
 
     .entry-builder {
         display: grid;
         grid-template-columns:
             minmax(0, 1fr)
-            minmax(22rem, 0.9fr);
+            minmax(23rem, 0.9fr);
 
         gap: 1.4rem;
 
         margin-top: 1.5rem;
     }
 
-
-    /* ========================================
-       Sections
-       ======================================== */
-
     .builder-form {
         display: grid;
         gap: 1rem;
     }
 
-    .builder-section {
+    .builder-section,
+    .builder-output {
         padding: 1.2rem;
 
         border:
@@ -378,29 +407,44 @@
     }
 
     :root[data-theme='light']
-    .builder-section {
+    .builder-section,
+    :root[data-theme='light']
+    .builder-output {
         background: #f8fbfc;
         border-color: #d6e2e8;
     }
 
     :root[data-theme='dark']
-    .builder-section {
+    .builder-section,
+    :root[data-theme='dark']
+    .builder-output {
         background: #101f27;
         border-color: #273c47;
     }
 
     .builder-section h2,
     .builder-output h2 {
-        margin: 0 0 1rem !important;
+        margin: 0 !important;
 
         font-size: 1.05rem;
         letter-spacing: -0.01em;
     }
 
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
 
-    /* ========================================
-       Fields
-       ======================================== */
+        gap: 1rem;
+
+        margin:
+            0
+            0
+            1rem !important;
+    }
+
+
+    /* Fields */
 
     .field {
         display: block;
@@ -434,8 +478,8 @@
         color: var(--sl-color-gray-3);
 
         font-size: 0.76rem;
+        line-height: 1.5;
     }
-
 
     input[type='text'],
     textarea,
@@ -477,9 +521,7 @@
     }
 
 
-    /* ========================================
-       ID
-       ======================================== */
+    /* ID */
 
     .id-row {
         display: grid;
@@ -490,10 +532,16 @@
         gap: 0.5rem;
     }
 
+    #eb-id-message.warning {
+        color: #b47b34;
+    }
 
-    /* ========================================
-       POS
-       ======================================== */
+    #eb-id-message.valid {
+        color: var(--sl-color-accent-high);
+    }
+
+
+    /* POS */
 
     .checkbox-grid {
         display: grid;
@@ -528,12 +576,215 @@
     }
 
 
-    /* ========================================
-       Buttons
-       ======================================== */
+    /* Dynamic items */
+
+    .dynamic-item {
+        padding: 0.9rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.45rem;
+
+        margin:
+            0
+            0
+            0.7rem !important;
+    }
+
+    .dynamic-item:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    .dynamic-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 1rem;
+
+        margin:
+            0
+            0
+            0.7rem !important;
+    }
+
+    .dynamic-item-title {
+        color: var(--sl-color-gray-2);
+
+        font-size: 0.8rem;
+        font-weight: 650;
+    }
+
+    .sense-fields {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(9rem, 0.38fr);
+
+        gap: 0.65rem;
+    }
+
+    .sense-fields .field {
+        margin-bottom: 0 !important;
+    }
+
+
+    /* Components */
+
+    .component-block {
+        margin-top: 1.2rem;
+    }
+
+    .component-header {
+        margin-bottom: 0.7rem !important;
+    }
+
+    .component-fields {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(9rem, 0.6fr);
+
+        gap: 0.65rem;
+    }
+
+    .component-fields .field {
+        margin-bottom: 0 !important;
+    }
+
+    .component-picker {
+        position: relative;
+    }
+
+    .component-results {
+        position: absolute;
+        z-index: 20;
+
+        inset-inline:
+            0;
+
+        top:
+            calc(100% + 0.3rem);
+
+        max-height: 18rem;
+        overflow-y: auto;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.42rem;
+
+        background: var(--sl-color-bg);
+
+        box-shadow:
+            0 0.5rem 1.5rem
+            rgba(0, 0, 0, 0.12);
+    }
+
+    .component-results[hidden] {
+        display: none;
+    }
+
+    .component-result {
+        display: block;
+
+        width: 100%;
+
+        margin: 0 !important;
+        padding: 0.55rem 0.65rem;
+
+        border: 0;
+        border-bottom:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        background: transparent;
+        color: var(--sl-color-gray-1);
+
+        text-align: left;
+        font: inherit;
+
+        cursor: pointer;
+    }
+
+    .component-result:last-child {
+        border-bottom: 0;
+    }
+
+    .component-result:hover {
+        background:
+            var(--sl-color-accent-low);
+    }
+
+    .result-head {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+
+        gap: 0.5rem;
+    }
+
+    .result-headword {
+        font-weight: 650;
+    }
+
+    .result-id {
+        color: var(--sl-color-gray-3);
+
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Consolas,
+            monospace;
+
+        font-size: 0.74rem;
+    }
+
+    .result-description {
+        display: block;
+
+        margin-top: 0.15rem;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.74rem;
+    }
+
+    .pending-result {
+        color: var(--sl-color-accent-high);
+    }
+
+    .component-status {
+        display: block;
+
+        min-height: 1rem;
+
+        margin-top: 0.35rem;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.74rem;
+    }
+
+    .component-status.valid {
+        color: var(--sl-color-accent-high);
+    }
+
+    .component-status.warning {
+        color: #b47b34;
+    }
+
+
+    /* Buttons */
 
     .small-button,
-    .copy-button {
+    .copy-button,
+    .delete-button {
+        box-sizing: border-box;
+
         margin: 0 !important;
 
         border:
@@ -552,6 +803,8 @@
     }
 
     .small-button {
+        min-height: 2.2rem;
+
         padding: 0 0.7rem;
 
         font-size: 0.78rem;
@@ -565,8 +818,19 @@
         font-size: 0.82rem;
     }
 
+    .delete-button {
+        padding:
+            0.25rem
+            0.5rem;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.72rem;
+    }
+
     .small-button:hover,
-    .copy-button:not(:disabled):hover {
+    .copy-button:not(:disabled):hover,
+    .delete-button:not(:disabled):hover {
         border-color:
             var(--sl-color-accent);
 
@@ -574,43 +838,20 @@
             var(--sl-color-accent-low);
     }
 
+    .delete-button:disabled,
     .copy-button:disabled {
-        opacity: 0.45;
+        opacity: 0.4;
         cursor: not-allowed;
     }
 
 
-    /* ========================================
-       Output
-       ======================================== */
+    /* Output */
 
     .builder-output {
         align-self: start;
 
         position: sticky;
         top: 5rem;
-
-        padding: 1.2rem;
-
-        border:
-            1px solid
-            var(--sl-color-hairline);
-
-        border-radius: 0.55rem;
-
-        margin: 0 !important;
-    }
-
-    :root[data-theme='light']
-    .builder-output {
-        background: #f8fbfc;
-        border-color: #d6e2e8;
-    }
-
-    :root[data-theme='dark']
-    .builder-output {
-        background: #101f27;
-        border-color: #273c47;
     }
 
     .output-header {
@@ -623,12 +864,11 @@
         margin-bottom: 0.8rem;
     }
 
-    .output-header h2 {
-        margin-bottom: 0.25rem !important;
-    }
-
     .output-header p {
-        margin: 0 !important;
+        margin:
+            0.3rem
+            0
+            0 !important;
 
         color: var(--sl-color-gray-3);
 
@@ -657,7 +897,7 @@
     }
 
     .json-output {
-        min-height: 36rem;
+        min-height: 38rem;
 
         font-family:
             ui-monospace,
@@ -670,11 +910,9 @@
     }
 
 
-    /* ========================================
-       Mobile
-       ======================================== */
+    /* Responsive */
 
-    @media (max-width: 55rem) {
+    @media (max-width: 60rem) {
 
         .entry-builder {
             grid-template-columns: 1fr;
@@ -686,10 +924,16 @@
 
     }
 
-    @media (max-width: 35rem) {
+    @media (max-width: 40rem) {
 
-        .checkbox-grid {
+        .checkbox-grid,
+        .sense-fields,
+        .component-fields {
             grid-template-columns: 1fr;
+        }
+
+        .section-header {
+            flex-direction: column;
         }
 
     }
@@ -707,26 +951,51 @@
         if (!root) return;
 
 
+        /* =====================================
+           Existing dictionary
+           ===================================== */
+
+        const dataScript =
+            document.querySelector(
+                '#eb-existing-entries'
+            );
+
+        const existingEntries =
+            JSON.parse(
+                dataScript?.textContent ?? '[]'
+            );
+
+        const existingIds =
+            new Set(
+                existingEntries.map(
+                    (entry) => entry.id
+                )
+            );
+
+
+        /* =====================================
+           Elements
+           ===================================== */
+
         const headword =
             root.querySelector('#eb-headword');
 
         const idInput =
             root.querySelector('#eb-id');
 
+        const idMessage =
+            root.querySelector('#eb-id-message');
+
         const regenerateId =
-            root.querySelector('#eb-regenerate-id');
+            root.querySelector(
+                '#eb-regenerate-id'
+            );
 
         const type =
             root.querySelector('#eb-type');
 
         const status =
             root.querySelector('#eb-status');
-
-        const definition =
-            root.querySelector('#eb-definition');
-
-        const gloss =
-            root.querySelector('#eb-gloss');
 
         const formationType =
             root.querySelector(
@@ -735,6 +1004,31 @@
 
         const analysis =
             root.querySelector('#eb-analysis');
+
+        const senseList =
+            root.querySelector(
+                '#eb-sense-list'
+            );
+
+        const addSenseButton =
+            root.querySelector(
+                '#eb-add-sense'
+            );
+
+        const componentBlock =
+            root.querySelector(
+                '#eb-component-block'
+            );
+
+        const componentList =
+            root.querySelector(
+                '#eb-component-list'
+            );
+
+        const addComponentButton =
+            root.querySelector(
+                '#eb-add-component'
+            );
 
         const ipa =
             root.querySelector('#eb-ipa');
@@ -749,7 +1043,9 @@
             root.querySelector('#eb-output');
 
         const validation =
-            root.querySelector('#eb-validation');
+            root.querySelector(
+                '#eb-validation'
+            );
 
         const copyButton =
             root.querySelector('#eb-copy');
@@ -758,17 +1054,18 @@
         let idEditedManually = false;
 
 
+        /* =====================================
+           ID
+           ===================================== */
+
         function makeId(value) {
 
             return value
 
-                /* 删除括号及括号中的内容 */
                 .replace(/\([^)]*\)/g, '')
 
-                /* 拆分附加符号 */
                 .normalize('NFD')
 
-                /* 删除音调 / 长音等组合符号 */
                 .replace(
                     /[\u0300-\u036f]/g,
                     ''
@@ -778,16 +1075,622 @@
 
                 .trim()
 
-                /* 空白变短杠 */
                 .replace(/\s+/g, '-')
 
-                /* 删除不允许的字符 */
                 .replace(/[^a-z0-9-]/g, '')
 
-                /* 多个短杠合一 */
                 .replace(/-{2,}/g, '-');
+
         }
 
+
+        function suggestAvailableId(baseId) {
+
+            if (!baseId) {
+                return '';
+            }
+
+            if (!existingIds.has(baseId)) {
+                return baseId;
+            }
+
+            let number = 2;
+
+            while (
+                existingIds.has(
+                    `${baseId}-${number}`
+                )
+            ) {
+                number += 1;
+            }
+
+            return `${baseId}-${number}`;
+
+        }
+
+
+        function updateAutomaticId() {
+
+            const baseId =
+                makeId(headword.value);
+
+            const suggestedId =
+                suggestAvailableId(baseId);
+
+            idInput.value =
+                suggestedId;
+
+
+            if (
+                baseId &&
+                baseId !== suggestedId
+            ) {
+                idMessage.className =
+                    'field-help warning';
+
+                idMessage.textContent =
+                    `基础 ID "${baseId}" 已存在，` +
+                    `已建议使用 "${suggestedId}"。`;
+            }
+            else if (suggestedId) {
+                idMessage.className =
+                    'field-help valid';
+
+                idMessage.textContent =
+                    `✓ ID "${suggestedId}" 当前可用。`;
+            }
+            else {
+                idMessage.className =
+                    'field-help';
+
+                idMessage.textContent =
+                    '根据词头自动建议，可手动修改。';
+            }
+
+        }
+
+
+        function updateManualIdMessage() {
+
+            const value =
+                idInput.value.trim();
+
+            if (!value) {
+                idMessage.className =
+                    'field-help';
+
+                idMessage.textContent =
+                    'ID 不能为空。';
+
+                return;
+            }
+
+            if (
+                !/^[a-z0-9-]+$/.test(value)
+            ) {
+                idMessage.className =
+                    'field-help warning';
+
+                idMessage.textContent =
+                    'ID 只能包含小写 ASCII 字母、数字和短杠。';
+
+                return;
+            }
+
+            if (existingIds.has(value)) {
+                idMessage.className =
+                    'field-help warning';
+
+                idMessage.textContent =
+                    `ID "${value}" 已存在。`;
+
+                return;
+            }
+
+            idMessage.className =
+                'field-help valid';
+
+            idMessage.textContent =
+                `✓ ID "${value}" 当前可用。`;
+
+        }
+
+
+        /* =====================================
+           Senses
+           ===================================== */
+
+        function refreshSenseNumbers() {
+
+            const items =
+                Array.from(
+                    senseList.querySelectorAll(
+                        '.sense-item'
+                    )
+                );
+
+            items.forEach(
+                (item, index) => {
+
+                    item.querySelector(
+                        '.dynamic-item-title'
+                    ).textContent =
+                        `义项 ${index + 1}`;
+
+                    const deleteButton =
+                        item.querySelector(
+                            '.delete-sense'
+                        );
+
+                    deleteButton.disabled =
+                        items.length === 1;
+
+                }
+            );
+
+        }
+
+
+        function addSense(
+            definition = '',
+            gloss = ''
+        ) {
+
+            const item =
+                document.createElement('div');
+
+            item.className =
+                'dynamic-item sense-item';
+
+            item.innerHTML = `
+                <div class="dynamic-item-header">
+                    <span class="dynamic-item-title"></span>
+
+                    <button
+                        type="button"
+                        class="delete-button delete-sense"
+                    >
+                        删除
+                    </button>
+                </div>
+
+                <div class="sense-fields">
+
+                    <label class="field">
+                        <span class="field-label">
+                            释义
+                        </span>
+
+                        <textarea
+                            class="sense-definition"
+                            rows="2"
+                            placeholder="例如：狗，犬"
+                        ></textarea>
+                    </label>
+
+                    <label class="field">
+                        <span class="field-label">
+                            Gloss
+                        </span>
+
+                        <input
+                            class="sense-gloss"
+                            type="text"
+                            placeholder="例如：狗"
+                        />
+                    </label>
+
+                </div>
+            `;
+
+            item.querySelector(
+                '.sense-definition'
+            ).value = definition;
+
+            item.querySelector(
+                '.sense-gloss'
+            ).value = gloss;
+
+            senseList.appendChild(item);
+
+            refreshSenseNumbers();
+            update();
+
+        }
+
+
+        /* =====================================
+           Components
+           ===================================== */
+
+        function normalizeSearch(value) {
+
+            return String(value)
+                .normalize('NFD')
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ''
+                )
+                .toLowerCase()
+                .trim();
+
+        }
+
+
+        function getEntrySearchText(entry) {
+
+            return normalizeSearch([
+                entry.id,
+                entry.headword,
+                ...(entry.definitions ?? []),
+                ...(entry.glosses ?? []),
+            ].join(' '));
+
+        }
+
+
+        function setComponentStatus(
+            item,
+            message,
+            state = ''
+        ) {
+
+            const statusElement =
+                item.querySelector(
+                    '.component-status'
+                );
+
+            statusElement.className =
+                `component-status ${state}`;
+
+            statusElement.textContent =
+                message;
+
+        }
+
+
+        function selectExistingComponent(
+            item,
+            entry
+        ) {
+
+            item.dataset.ref =
+                entry.id;
+
+            const search =
+                item.querySelector(
+                    '.component-search'
+                );
+
+            const form =
+                item.querySelector(
+                    '.component-form'
+                );
+
+            search.value =
+                entry.headword;
+
+            if (!form.value.trim()) {
+                form.value =
+                    entry.headword;
+            }
+
+            setComponentStatus(
+                item,
+                `✓ 已选择 ID: ${entry.id}`,
+                'valid'
+            );
+
+            item.querySelector(
+                '.component-results'
+            ).hidden = true;
+
+            update();
+
+        }
+
+
+        function selectPendingComponent(
+            item,
+            rawValue
+        ) {
+
+            const ref =
+                makeId(rawValue);
+
+            if (!ref) return;
+
+            item.dataset.ref =
+                ref;
+
+            const form =
+                item.querySelector(
+                    '.component-form'
+                );
+
+            if (!form.value.trim()) {
+                form.value =
+                    rawValue.trim();
+            }
+
+            setComponentStatus(
+                item,
+                `⚠ 暂未收录 ID: ${ref}`,
+                'warning'
+            );
+
+            item.querySelector(
+                '.component-results'
+            ).hidden = true;
+
+            update();
+
+        }
+
+
+        function renderComponentResults(
+            item,
+            rawQuery
+        ) {
+
+            const container =
+                item.querySelector(
+                    '.component-results'
+                );
+
+            container.innerHTML = '';
+
+            const query =
+                normalizeSearch(rawQuery);
+
+            if (!query) {
+                container.hidden = true;
+                return;
+            }
+
+
+            const matches =
+                existingEntries
+                    .filter((entry) =>
+                        getEntrySearchText(entry)
+                            .includes(query)
+                    )
+                    .slice(0, 8);
+
+
+            matches.forEach((entry) => {
+
+                const button =
+                    document.createElement(
+                        'button'
+                    );
+
+                button.type = 'button';
+                button.className =
+                    'component-result';
+
+                const head =
+                    document.createElement(
+                        'span'
+                    );
+
+                head.className =
+                    'result-head';
+
+                const headword =
+                    document.createElement(
+                        'span'
+                    );
+
+                headword.className =
+                    'result-headword';
+
+                headword.textContent =
+                    entry.headword;
+
+                const id =
+                    document.createElement(
+                        'span'
+                    );
+
+                id.className =
+                    'result-id';
+
+                id.textContent =
+                    `ID: ${entry.id}`;
+
+                head.append(
+                    headword,
+                    id
+                );
+
+                button.appendChild(head);
+
+
+                if (
+                    entry.definitions?.[0]
+                ) {
+                    const description =
+                        document.createElement(
+                            'span'
+                        );
+
+                    description.className =
+                        'result-description';
+
+                    description.textContent =
+                        entry.definitions[0];
+
+                    button.appendChild(
+                        description
+                    );
+                }
+
+
+                button.addEventListener(
+                    'click',
+                    () => {
+                        selectExistingComponent(
+                            item,
+                            entry
+                        );
+                    }
+                );
+
+                container.appendChild(
+                    button
+                );
+
+            });
+
+
+            const pendingId =
+                makeId(rawQuery);
+
+            if (
+                pendingId &&
+                !existingIds.has(pendingId)
+            ) {
+
+                const pendingButton =
+                    document.createElement(
+                        'button'
+                    );
+
+                pendingButton.type =
+                    'button';
+
+                pendingButton.className =
+                    'component-result pending-result';
+
+                pendingButton.textContent =
+                    `＋ 使用 "${pendingId}" ` +
+                    `作为暂未收录的 ID`;
+
+                pendingButton.addEventListener(
+                    'click',
+                    () => {
+                        selectPendingComponent(
+                            item,
+                            rawQuery
+                        );
+                    }
+                );
+
+                container.appendChild(
+                    pendingButton
+                );
+
+            }
+
+
+            if (
+                container.children.length === 0
+            ) {
+                container.hidden = true;
+                return;
+            }
+
+            container.hidden = false;
+
+        }
+
+
+        function addComponent() {
+
+            const item =
+                document.createElement('div');
+
+            item.className =
+                'dynamic-item component-item';
+
+            item.dataset.ref = '';
+
+            item.innerHTML = `
+                <div class="dynamic-item-header">
+                    <span class="dynamic-item-title">
+                        构词成分
+                    </span>
+
+                    <button
+                        type="button"
+                        class="delete-button delete-component"
+                    >
+                        删除
+                    </button>
+                </div>
+
+                <div class="component-fields">
+
+                    <div class="field component-picker">
+
+                        <span class="field-label">
+                            引用词条
+                        </span>
+
+                        <input
+                            class="component-search"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="搜索 ID、词形或释义……"
+                        />
+
+                        <span class="component-status">
+                            尚未选择引用。
+                        </span>
+
+                        <div
+                            class="component-results"
+                            hidden
+                        ></div>
+
+                    </div>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            实际形式
+                        </span>
+
+                        <input
+                            class="component-form"
+                            type="text"
+                            placeholder="构词中实际出现的形式"
+                        />
+
+                    </label>
+
+                </div>
+            `;
+
+            componentList.appendChild(
+                item
+            );
+
+            update();
+
+        }
+
+
+        function updateComponentVisibility() {
+
+            const type =
+                formationType.value;
+
+            const hidden =
+                type === 'simple' ||
+                type === 'root';
+
+            componentBlock.hidden =
+                hidden;
+
+        }
+
+
+        /* =====================================
+           Build JSON
+           ===================================== */
 
         function getSelectedPos() {
 
@@ -803,19 +1706,105 @@
         }
 
 
+        function getSenses() {
+
+            return Array.from(
+                senseList.querySelectorAll(
+                    '.sense-item'
+                )
+            )
+            .map((item) => {
+
+                const definition =
+                    item.querySelector(
+                        '.sense-definition'
+                    ).value.trim();
+
+                const gloss =
+                    item.querySelector(
+                        '.sense-gloss'
+                    ).value.trim();
+
+
+                if (
+                    !definition &&
+                    !gloss
+                ) {
+                    return null;
+                }
+
+
+                const sense = {
+                    definition
+                };
+
+                if (gloss) {
+                    sense.gloss =
+                        gloss;
+                }
+
+                return sense;
+
+            })
+            .filter(Boolean);
+
+        }
+
+
+        function getComponents() {
+
+            if (
+                formationType.value ===
+                    'simple' ||
+                formationType.value ===
+                    'root'
+            ) {
+                return [];
+            }
+
+
+            return Array.from(
+                componentList.querySelectorAll(
+                    '.component-item'
+                )
+            )
+            .map((item) => {
+
+                const ref =
+                    item.dataset.ref ?? '';
+
+                const form =
+                    item.querySelector(
+                        '.component-form'
+                    ).value.trim();
+
+                const search =
+                    item.querySelector(
+                        '.component-search'
+                    ).value.trim();
+
+
+                if (
+                    !ref &&
+                    !form &&
+                    !search
+                ) {
+                    return null;
+                }
+
+
+                return {
+                    ref,
+                    form
+                };
+
+            })
+            .filter(Boolean);
+
+        }
+
+
         function buildEntry() {
-
-            const selectedPos =
-                getSelectedPos();
-
-            const sense = {
-                definition:
-                    definition.value.trim(),
-
-                gloss:
-                    gloss.value.trim()
-            };
-
 
             return {
                 id:
@@ -828,16 +1817,15 @@
                     type.value,
 
                 pos:
-                    selectedPos,
+                    getSelectedPos(),
 
                 pronunciation: {
                     ipa:
                         ipa.value.trim()
                 },
 
-                senses: [
-                    sense
-                ],
+                senses:
+                    getSenses(),
 
                 formation: {
                     type:
@@ -846,7 +1834,8 @@
                     analysis:
                         analysis.value.trim(),
 
-                    components: []
+                    components:
+                        getComponents()
                 },
 
                 etymology:
@@ -875,27 +1864,46 @@
         }
 
 
+        /* =====================================
+           Validation
+           ===================================== */
+
         function validateEntry(entry) {
 
             const errors = [];
 
 
             if (!entry.headword) {
-                errors.push('请填写词头。');
+                errors.push(
+                    '请填写词头。'
+                );
             }
+
 
             if (!entry.id) {
-                errors.push('ID 不能为空。');
+                errors.push(
+                    'ID 不能为空。'
+                );
             }
-
-            if (
-                entry.id &&
-                !/^[a-z0-9-]+$/.test(entry.id)
+            else if (
+                !/^[a-z0-9-]+$/.test(
+                    entry.id
+                )
             ) {
                 errors.push(
                     'ID 只能包含小写 ASCII 字母、数字和短杠。'
                 );
             }
+            else if (
+                existingIds.has(
+                    entry.id
+                )
+            ) {
+                errors.push(
+                    `ID "${entry.id}" 已存在。`
+                );
+            }
+
 
             if (
                 entry.type !== 'root' &&
@@ -906,11 +1914,51 @@
                 );
             }
 
+
             if (
-                !entry.senses[0].definition
+                entry.senses.length === 0
             ) {
-                errors.push('请填写释义。');
+                errors.push(
+                    '至少需要一个义项。'
+                );
             }
+
+            entry.senses.forEach(
+                (sense, index) => {
+
+                    if (!sense.definition) {
+                        errors.push(
+                            `义项 ${index + 1} ` +
+                            `缺少释义。`
+                        );
+                    }
+
+                }
+            );
+
+
+            entry.formation.components
+                .forEach(
+                    (component, index) => {
+
+                        if (!component.ref) {
+                            errors.push(
+                                `构词成分 ` +
+                                `${index + 1} ` +
+                                `尚未选择 ref。`
+                            );
+                        }
+
+                        if (!component.form) {
+                            errors.push(
+                                `构词成分 ` +
+                                `${index + 1} ` +
+                                `缺少实际形式。`
+                            );
+                        }
+
+                    }
+                );
 
 
             return errors;
@@ -943,7 +1991,8 @@
                 validation.textContent =
                     errors.join(' ');
 
-                copyButton.disabled = true;
+                copyButton.disabled =
+                    true;
 
                 return;
 
@@ -954,20 +2003,24 @@
                 'validation valid';
 
             validation.textContent =
-                '✓ 当前基本字段有效';
+                '✓ 当前词条基本结构有效';
 
-            copyButton.disabled = false;
+            copyButton.disabled =
+                false;
 
         }
 
+
+        /* =====================================
+           Events
+           ===================================== */
 
         headword.addEventListener(
             'input',
             () => {
 
                 if (!idEditedManually) {
-                    idInput.value =
-                        makeId(headword.value);
+                    updateAutomaticId();
                 }
 
                 update();
@@ -980,8 +2033,10 @@
             'input',
             () => {
 
-                idEditedManually = true;
+                idEditedManually =
+                    true;
 
+                updateManualIdMessage();
                 update();
 
             }
@@ -992,10 +2047,78 @@
             'click',
             () => {
 
-                idEditedManually = false;
+                idEditedManually =
+                    false;
 
-                idInput.value =
-                    makeId(headword.value);
+                updateAutomaticId();
+                update();
+
+            }
+        );
+
+
+        addSenseButton.addEventListener(
+            'click',
+            () => {
+                addSense();
+            }
+        );
+
+
+        addComponentButton.addEventListener(
+            'click',
+            () => {
+                addComponent();
+            }
+        );
+
+
+        senseList.addEventListener(
+            'click',
+            (event) => {
+
+                const button =
+                    event.target.closest(
+                        '.delete-sense'
+                    );
+
+                if (!button) return;
+
+                const item =
+                    button.closest(
+                        '.sense-item'
+                    );
+
+                if (!item) return;
+
+                item.remove();
+
+                refreshSenseNumbers();
+                update();
+
+            }
+        );
+
+
+        componentList.addEventListener(
+            'click',
+            (event) => {
+
+                const button =
+                    event.target.closest(
+                        '.delete-component'
+                    );
+
+                if (!button) return;
+
+                const item =
+                    button.closest(
+                        '.component-item'
+                    );
+
+                if (!item) return;
+
+                item.remove();
 
                 update();
 
@@ -1003,30 +2126,106 @@
         );
 
 
-        root
-            .querySelectorAll(
-                'input, textarea, select'
-            )
-            .forEach((element) => {
+        componentList.addEventListener(
+            'input',
+            (event) => {
+
+                const search =
+                    event.target.closest(
+                        '.component-search'
+                    );
+
+                if (search) {
+
+                    const item =
+                        search.closest(
+                            '.component-item'
+                        );
+
+                    item.dataset.ref = '';
+
+                    setComponentStatus(
+                        item,
+                        '尚未选择引用。'
+                    );
+
+                    renderComponentResults(
+                        item,
+                        search.value
+                    );
+
+                }
+
+                update();
+
+            }
+        );
+
+
+        root.addEventListener(
+            'input',
+            (event) => {
 
                 if (
-                    element === headword ||
-                    element === idInput
+                    event.target ===
+                        headword ||
+                    event.target ===
+                        idInput ||
+                    event.target.closest(
+                        '.component-search'
+                    )
                 ) {
                     return;
                 }
 
-                element.addEventListener(
-                    'input',
-                    update
-                );
+                update();
 
-                element.addEventListener(
-                    'change',
-                    update
-                );
+            }
+        );
 
-            });
+
+        root.addEventListener(
+            'change',
+            (event) => {
+
+                if (
+                    event.target ===
+                    formationType
+                ) {
+                    updateComponentVisibility();
+                }
+
+                update();
+
+            }
+        );
+
+
+        document.addEventListener(
+            'click',
+            (event) => {
+
+                if (
+                    event.target.closest(
+                        '.component-picker'
+                    )
+                ) {
+                    return;
+                }
+
+                root
+                    .querySelectorAll(
+                        '.component-results'
+                    )
+                    .forEach(
+                        (results) => {
+                            results.hidden =
+                                true;
+                        }
+                    );
+
+            }
+        );
 
 
         copyButton.addEventListener(
@@ -1073,6 +2272,14 @@
         );
 
 
+        /* =====================================
+           Initialise
+           ===================================== */
+
+        addSense();
+
+        updateComponentVisibility();
+        updateAutomaticId();
         update();
 
     }

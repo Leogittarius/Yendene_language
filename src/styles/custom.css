@@ -367,3 +367,7 @@ header a[href="/"] {
 body:has(.dictionary) {
     --sl-content-width: 68rem;
 }
+
+body:has(.entry-builder) {
+    --sl-content-width: 72rem;
+}
