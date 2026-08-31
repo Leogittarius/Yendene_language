@@ -84,7 +84,12 @@ export default defineConfig({
                         {
                             label: '词条生成器',
                             slug: 'tools/entry-builder',
-                        }
+                        },
+                        {
+                            label: '词典维护',
+                            slug: 'tools/dictionary-maintenance',
+                        },
+                        
                     ],
                 },
 

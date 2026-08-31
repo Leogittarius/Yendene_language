@@ -1,0 +1,1690 @@
+---
+import dictionary from '@data/dictionary.json';
+
+const entries = dictionary.entries;
+
+
+/* =========================================================
+   Labels
+   ========================================================= */
+
+const posLabels = {
+    noun: 'n. 普通名词',
+    verb: 'v. 普通动态动词',
+    stative: 'stat. 状态动词',
+    numeral: 'num. 数量状态动词',
+    pronoun: 'pron. 代词',
+    function: 'func. 普通功能词',
+    lightverb: 'lv. 轻动词',
+    particle: 'part. 构式粒子',
+    affix: 'aff. 普通派生词缀',
+    converb: 'conv. 副动词后缀',
+};
+
+
+const formationLabels = {
+    root: '词根',
+    simple: '单纯形式',
+    derived: '派生',
+    compound: '复合',
+    reduplicated: '重叠',
+    ideophonic: '拟声 / 表意',
+    opaque: '构词不透明',
+    borrowed: '借词',
+};
+
+
+const relationLabels = {
+    related: '相关词',
+    synonyms: '同义词',
+    antonyms: '反义词',
+    derived: '派生词',
+};
+
+
+const statusLabels = {
+    established: '已确定',
+    draft: '草案',
+    deprecated: '已废弃',
+};
+
+
+/* =========================================================
+   Generic helpers
+   ========================================================= */
+
+function increment(map, key) {
+
+    if (!key) return;
+
+    map.set(
+        key,
+        (map.get(key) ?? 0) + 1
+    );
+
+}
+
+
+function sortCounts(map) {
+
+    return Array.from(
+        map.entries()
+    )
+        .map(([key, count]) => ({
+            key,
+            count,
+        }))
+        .sort(
+            (a, b) =>
+                b.count - a.count ||
+                String(a.key).localeCompare(
+                    String(b.key),
+                    'zh-CN'
+                )
+        );
+
+}
+
+
+/* =========================================================
+   Basic counts
+   ========================================================= */
+
+const totalEntries =
+    entries.length;
+
+
+const statusCounts =
+    new Map();
+
+const posCounts =
+    new Map();
+
+const formationCounts =
+    new Map();
+
+const tagCounts =
+    new Map();
+
+
+let entriesWithExamples = 0;
+let entriesWithoutExamples = 0;
+
+let entriesWithTags = 0;
+let entriesWithoutTags = 0;
+
+let entriesWithEtymology = 0;
+let entriesWithoutEtymology = 0;
+
+
+/* =========================================================
+   Unresolved references
+   ========================================================= */
+
+const existingIds =
+    new Set(
+        entries.map(
+            (entry) => entry.id
+        )
+    );
+
+
+/*
+ * Map:
+ *
+ * missing-id
+ * →
+ * {
+ *   id,
+ *   sources: [...]
+ * }
+ */
+const unresolvedMap =
+    new Map();
+
+
+let unresolvedReferenceCount =
+    0;
+
+
+function addUnresolvedReference(
+    missingId,
+    source
+) {
+
+    if (!missingId) return;
+
+
+    unresolvedReferenceCount += 1;
+
+
+    if (
+        !unresolvedMap.has(
+            missingId
+        )
+    ) {
+
+        unresolvedMap.set(
+            missingId,
+            {
+                id: missingId,
+                sources: [],
+            }
+        );
+
+    }
+
+
+    unresolvedMap
+        .get(missingId)
+        .sources
+        .push(source);
+
+}
+
+
+/* =========================================================
+   Scan dictionary
+   ========================================================= */
+
+entries.forEach((entry) => {
+
+    /* ---------- status ---------- */
+
+    increment(
+        statusCounts,
+        entry.status ?? 'unknown'
+    );
+
+
+    /* ---------- POS ---------- */
+
+    (entry.pos ?? [])
+        .forEach((pos) => {
+
+            increment(
+                posCounts,
+                pos
+            );
+
+        });
+
+
+    /* ---------- formation ---------- */
+
+    if (entry.formation?.type) {
+
+        increment(
+            formationCounts,
+            entry.formation.type
+        );
+
+    }
+
+
+    /* ---------- tags ---------- */
+
+    const uniqueTags =
+        new Set(
+            (entry.tags ?? [])
+                .map((tag) =>
+                    String(tag).trim()
+                )
+                .filter(Boolean)
+        );
+
+
+    uniqueTags.forEach((tag) => {
+
+        increment(
+            tagCounts,
+            tag
+        );
+
+    });
+
+
+    if (uniqueTags.size > 0) {
+        entriesWithTags += 1;
+    }
+    else {
+        entriesWithoutTags += 1;
+    }
+
+
+    /* ---------- examples ---------- */
+
+    if (
+        (entry.examples ?? [])
+            .length > 0
+    ) {
+        entriesWithExamples += 1;
+    }
+    else {
+        entriesWithoutExamples += 1;
+    }
+
+
+    /* ---------- etymology ---------- */
+
+    if (
+        String(
+            entry.etymology ?? ''
+        ).trim()
+    ) {
+        entriesWithEtymology += 1;
+    }
+    else {
+        entriesWithoutEtymology += 1;
+    }
+
+
+    /* ---------- formation refs ---------- */
+
+    (
+        entry.formation
+            ?.components ??
+        []
+    )
+        .forEach((component) => {
+
+            const ref =
+                component.ref;
+
+
+            if (
+                ref &&
+                !existingIds.has(ref)
+            ) {
+
+                addUnresolvedReference(
+                    ref,
+                    {
+                        sourceId:
+                            entry.id,
+
+                        sourceHeadword:
+                            entry.headword,
+
+                        type:
+                            'component',
+
+                        label:
+                            '构词成分',
+
+                        detail:
+                            component.form ??
+                            '',
+                    }
+                );
+
+            }
+
+        });
+
+
+    /* ---------- relation refs ---------- */
+
+    Object.entries(
+        entry.relations ?? {}
+    )
+        .forEach(
+            ([relationType, refs]) => {
+
+                if (
+                    !Array.isArray(refs)
+                ) {
+                    return;
+                }
+
+
+                refs.forEach((ref) => {
+
+                    if (
+                        ref &&
+                        !existingIds.has(ref)
+                    ) {
+
+                        addUnresolvedReference(
+                            ref,
+                            {
+                                sourceId:
+                                    entry.id,
+
+                                sourceHeadword:
+                                    entry.headword,
+
+                                type:
+                                    'relation',
+
+                                label:
+                                    relationLabels[
+                                        relationType
+                                    ] ??
+                                    relationType,
+
+                                detail:
+                                    '',
+                            }
+                        );
+
+                    }
+
+                });
+
+            }
+        );
+
+});
+
+
+/* =========================================================
+   Prepared data
+   ========================================================= */
+
+const unresolvedReferences =
+    Array.from(
+        unresolvedMap.values()
+    )
+        .sort(
+            (a, b) =>
+                b.sources.length -
+                    a.sources.length ||
+                a.id.localeCompare(
+                    b.id
+                )
+        );
+
+
+const uniqueTagCount =
+    tagCounts.size;
+
+
+const sortedPosCounts =
+    sortCounts(
+        posCounts
+    );
+
+
+const sortedFormationCounts =
+    sortCounts(
+        formationCounts
+    );
+
+
+const sortedTagCounts =
+    sortCounts(
+        tagCounts
+    );
+
+
+const draftEntries =
+    entries
+        .filter(
+            (entry) =>
+                entry.status ===
+                'draft'
+        )
+        .sort(
+            (a, b) =>
+                a.headword.localeCompare(
+                    b.headword
+                )
+        );
+
+
+const establishedCount =
+    statusCounts.get(
+        'established'
+    ) ?? 0;
+
+
+const draftCount =
+    statusCounts.get(
+        'draft'
+    ) ?? 0;
+
+
+const deprecatedCount =
+    statusCounts.get(
+        'deprecated'
+    ) ?? 0;
+---
+
+
+<div class="maintenance">
+
+    <!-- ===================================================
+         Summary
+         =================================================== -->
+
+    <section class="maintenance-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>词典概况</h2>
+
+                <p>
+                    当前 dictionary.json 的整体状态。
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="summary-grid">
+
+            <div class="summary-card">
+                <span class="summary-value">
+                    {totalEntries}
+                </span>
+
+                <span class="summary-label">
+                    总词条
+                </span>
+            </div>
+
+
+            <div class="summary-card">
+                <span class="summary-value">
+                    {establishedCount}
+                </span>
+
+                <span class="summary-label">
+                    已确定
+                </span>
+            </div>
+
+
+            <div class="summary-card">
+                <span class="summary-value">
+                    {draftCount}
+                </span>
+
+                <span class="summary-label">
+                    草案
+                </span>
+            </div>
+
+
+            <div class="summary-card">
+                <span class="summary-value">
+                    {deprecatedCount}
+                </span>
+
+                <span class="summary-label">
+                    已废弃
+                </span>
+            </div>
+
+
+            <div class="summary-card">
+                <span class="summary-value">
+                    {uniqueTagCount}
+                </span>
+
+                <span class="summary-label">
+                    唯一标签
+                </span>
+            </div>
+
+
+            <div class="summary-card">
+                <span class="summary-value">
+                    {entriesWithExamples}
+                </span>
+
+                <span class="summary-label">
+                    有例句
+                </span>
+            </div>
+
+
+            <div
+                class:list={[
+                    'summary-card',
+                    unresolvedReferences.length > 0 &&
+                        'summary-warning',
+                ]}
+            >
+                <span class="summary-value">
+                    {unresolvedReferences.length}
+                </span>
+
+                <span class="summary-label">
+                    未解析 ID
+                </span>
+            </div>
+
+
+            <div
+                class:list={[
+                    'summary-card',
+                    unresolvedReferenceCount > 0 &&
+                        'summary-warning',
+                ]}
+            >
+                <span class="summary-value">
+                    {unresolvedReferenceCount}
+                </span>
+
+                <span class="summary-label">
+                    未解析引用
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         Unresolved references
+         =================================================== -->
+
+    <section class="maintenance-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>未解析引用</h2>
+
+                <p>
+                    已经被其他词条引用，
+                    但目前尚不存在于词典中的 ID。
+                </p>
+            </div>
+
+            <span class="section-count">
+                {unresolvedReferences.length}
+            </span>
+
+        </div>
+
+
+        {
+            unresolvedReferences.length === 0 ? (
+
+                <div class="empty-state">
+                    ✓ 当前没有未解析引用。
+                </div>
+
+            ) : (
+
+                <details
+                    class="unresolved-details"
+                    open={unresolvedReferences.length <= 10}
+                >
+
+                    <summary class="unresolved-summary">
+
+                        <span class="unresolved-summary-closed">
+                            展开未解析引用
+                        </span>
+
+                        <span class="unresolved-summary-open">
+                            收起未解析引用
+                        </span>
+
+                        <span class="unresolved-summary-info">
+                            {unresolvedReferences.length} 个 ID，
+                            {unresolvedReferenceCount} 处引用
+                        </span>
+
+                    </summary>
+
+
+                    <div class="unresolved-list">
+
+                        {
+                            unresolvedReferences.map(
+                                (item) => (
+
+                                    <article
+                                        class="unresolved-item"
+                                    >
+
+                                        <header
+                                            class="unresolved-header"
+                                        >
+
+                                            <code>
+                                                {item.id}
+                                            </code>
+
+                                            <span
+                                                class="reference-count"
+                                            >
+                                                {
+                                                    item.sources
+                                                        .length
+                                                }
+                                                {' '}
+                                                处引用
+                                            </span>
+
+                                        </header>
+
+
+                                        <div
+                                            class="reference-sources"
+                                        >
+
+                                            {
+                                                item.sources.map(
+                                                    (source) => (
+
+                                                        <div
+                                                            class="reference-source"
+                                                        >
+
+                                                            <a
+                                                                href={`/dictionary/#${source.sourceId}`}
+                                                                class="source-entry"
+                                                            >
+                                                                {
+                                                                    source.sourceHeadword
+                                                                }
+                                                            </a>
+
+
+                                                            <span
+                                                                class="reference-type"
+                                                            >
+                                                                {
+                                                                    source.label
+                                                                }
+                                                            </span>
+
+
+                                                            {
+                                                                source.detail && (
+                                                                    <span
+                                                                        class="reference-detail"
+                                                                    >
+                                                                        {
+                                                                            source.detail
+                                                                        }
+                                                                    </span>
+                                                                )
+                                                            }
+
+                                                        </div>
+
+                                                    )
+                                                )
+                                            }
+
+                                        </div>
+
+                                    </article>
+
+                                )
+                            )
+                        }
+
+                    </div>
+
+                </details>
+
+            )
+        }
+
+    </section>
+
+
+    <!-- ===================================================
+         Coverage
+         =================================================== -->
+
+    <section class="maintenance-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>内容覆盖</h2>
+
+                <p>
+                    这些数字只是描述当前资料覆盖情况，
+                    并不代表所有空项都必须补全。
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="coverage-list">
+
+            <div class="coverage-row">
+
+                <span>
+                    有例句
+                </span>
+
+                <strong>
+                    {entriesWithExamples}
+                </strong>
+
+            </div>
+
+
+            <div class="coverage-row">
+
+                <span>
+                    无例句
+                </span>
+
+                <strong>
+                    {entriesWithoutExamples}
+                </strong>
+
+            </div>
+
+
+            <div class="coverage-row">
+
+                <span>
+                    有标签
+                </span>
+
+                <strong>
+                    {entriesWithTags}
+                </strong>
+
+            </div>
+
+
+            <div class="coverage-row">
+
+                <span>
+                    无标签
+                </span>
+
+                <strong>
+                    {entriesWithoutTags}
+                </strong>
+
+            </div>
+
+
+            <div class="coverage-row">
+
+                <span>
+                    有词源
+                </span>
+
+                <strong>
+                    {entriesWithEtymology}
+                </strong>
+
+            </div>
+
+
+            <div class="coverage-row">
+
+                <span>
+                    无词源
+                </span>
+
+                <strong>
+                    {entriesWithoutEtymology}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         POS
+         =================================================== -->
+
+    <section class="maintenance-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>词性分布</h2>
+            </div>
+
+        </div>
+
+
+        <div class="stat-list">
+
+            {
+                sortedPosCounts.map(
+                    ({ key, count }) => (
+
+                        <div class="stat-row">
+
+                            <span>
+                                {
+                                    posLabels[key] ??
+                                    key
+                                }
+                            </span>
+
+                            <strong>
+                                {count}
+                            </strong>
+
+                        </div>
+
+                    )
+                )
+            }
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         Formation
+         =================================================== -->
+
+    <section class="maintenance-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>构词类型</h2>
+            </div>
+
+        </div>
+
+
+        <div class="stat-list">
+
+            {
+                sortedFormationCounts.map(
+                    ({ key, count }) => (
+
+                        <div class="stat-row">
+
+                            <span>
+                                {
+                                    formationLabels[key] ??
+                                    key
+                                }
+                            </span>
+
+                            <strong>
+                                {count}
+                            </strong>
+
+                        </div>
+
+                    )
+                )
+            }
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         Tags
+         =================================================== -->
+
+    <section class="maintenance-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>标签统计</h2>
+
+                <p>
+                    每个数字表示使用该标签的词条数量。
+                </p>
+            </div>
+
+        </div>
+
+
+        {
+            sortedTagCounts.length === 0 ? (
+
+                <div class="empty-state">
+                    当前还没有标签。
+                </div>
+
+            ) : (
+
+                <div class="tag-stats">
+
+                    {
+                        sortedTagCounts.map(
+                            ({ key, count }) => (
+
+                                <div
+                                    class="tag-stat"
+                                >
+
+                                    <span>
+                                        {key}
+                                    </span>
+
+                                    <strong>
+                                        {count}
+                                    </strong>
+
+                                </div>
+
+                            )
+                        )
+                    }
+
+                </div>
+
+            )
+        }
+
+    </section>
+
+
+    <!-- ===================================================
+         Drafts
+         =================================================== -->
+
+    {
+        draftEntries.length > 0 && (
+
+            <section class="maintenance-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>草案词条</h2>
+
+                        <p>
+                            当前仍标记为 draft 的词条。
+                        </p>
+                    </div>
+
+                    <span class="section-count">
+                        {draftEntries.length}
+                    </span>
+
+                </div>
+
+
+                <div class="draft-list">
+
+                    {
+                        draftEntries.map(
+                            (entry) => (
+
+                                <a
+                                    class="draft-entry"
+                                    href={`/dictionary/#${entry.id}`}
+                                >
+
+                                    <span>
+                                        {entry.headword}
+                                    </span>
+
+                                    <code>
+                                        {entry.id}
+                                    </code>
+
+                                </a>
+
+                            )
+                        )
+                    }
+
+                </div>
+
+            </section>
+
+        )
+    }
+
+</div>
+
+
+<style>
+
+    .maintenance {
+        display: grid;
+
+        gap: 1rem;
+
+        margin-top: 1.5rem;
+    }
+
+
+    /* =====================================================
+       Sections
+       ===================================================== */
+
+    .maintenance-section {
+        margin: 0 !important;
+
+        padding: 1.2rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.55rem;
+    }
+
+
+    :root[data-theme='light']
+    .maintenance-section {
+        background: #f8fbfc;
+
+        border-color: #d6e2e8;
+    }
+
+
+    :root[data-theme='dark']
+    .maintenance-section {
+        background: #101f27;
+
+        border-color: #273c47;
+    }
+
+
+    .section-heading {
+        display: flex;
+
+        align-items: flex-start;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        margin:
+            0
+            0
+            1rem !important;
+    }
+
+
+    .section-heading h2 {
+        margin: 0 !important;
+
+        font-size: 1.05rem;
+    }
+
+
+    .section-heading p {
+        margin:
+            0.3rem
+            0
+            0 !important;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.78rem;
+        line-height: 1.55;
+    }
+
+
+    .section-count {
+        flex: none;
+
+        min-width: 2rem;
+
+        padding:
+            0.2rem
+            0.5rem;
+
+        border-radius: 999px;
+
+        background:
+            var(--sl-color-accent-low);
+
+        color:
+            var(--sl-color-accent-high);
+
+        font-size: 0.76rem;
+        font-weight: 650;
+
+        text-align: center;
+    }
+
+
+    /* =====================================================
+       Summary
+       ===================================================== */
+
+    .summary-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                4,
+                minmax(0, 1fr)
+            );
+
+        gap: 0.7rem;
+    }
+
+
+    .summary-card {
+        display: flex;
+        flex-direction: column;
+
+        gap: 0.15rem;
+
+        padding: 0.85rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        border-radius: 0.45rem;
+    }
+
+
+    .summary-value {
+        color:
+            var(--sl-color-white);
+
+        font-size: 1.4rem;
+        font-weight: 700;
+
+        font-variant-numeric:
+            tabular-nums;
+    }
+
+
+    .summary-label {
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.75rem;
+    }
+
+
+    .summary-warning {
+        border-color:
+            #a77c4d;
+    }
+
+
+    /* =====================================================
+       Unresolved
+       ===================================================== */
+
+    .unresolved-list {
+        display: grid;
+
+        gap: 0.7rem;
+    }
+
+
+    .unresolved-item {
+        margin: 0 !important;
+
+        padding: 0.85rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        border-radius: 0.45rem;
+    }
+
+
+    .unresolved-header {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        margin:
+            0
+            0
+            0.65rem !important;
+    }
+
+
+    .unresolved-header code {
+        color:
+            var(--sl-color-accent-high);
+
+        font-size: 0.9rem;
+        font-weight: 650;
+    }
+
+
+    .reference-count {
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.74rem;
+    }
+
+
+    .reference-sources {
+        display: grid;
+
+        gap: 0.4rem;
+    }
+
+
+    .reference-source {
+        display: grid;
+
+        grid-template-columns:
+            minmax(8rem, 1fr)
+            minmax(5rem, 0.45fr)
+            minmax(0, 1fr);
+
+        align-items: baseline;
+
+        gap: 0.6rem;
+
+        padding-top: 0.4rem;
+
+        border-top:
+            1px solid
+            var(--sl-color-hairline-light);
+    }
+
+
+    .source-entry {
+        color:
+            var(--sl-color-accent-high);
+
+        font-weight: 550;
+
+        text-decoration: none !important;
+    }
+
+
+    .source-entry:hover {
+        text-decoration:
+            underline !important;
+    }
+
+
+    .reference-type {
+        color:
+            var(--sl-color-gray-2);
+
+        font-size: 0.78rem;
+    }
+
+
+    .reference-detail {
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.78rem;
+    }
+
+
+    /* =====================================================
+       Lists
+       ===================================================== */
+
+    .coverage-list,
+    .stat-list {
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap: 0.5rem;
+    }
+
+
+    .coverage-row,
+    .stat-row {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        padding:
+            0.55rem
+            0.65rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        border-radius: 0.4rem;
+
+        color:
+            var(--sl-color-gray-2);
+
+        font-size: 0.8rem;
+    }
+
+
+    .coverage-row strong,
+    .stat-row strong {
+        color:
+            var(--sl-color-white);
+
+        font-variant-numeric:
+            tabular-nums;
+    }
+
+
+    /* =====================================================
+       Tags
+       ===================================================== */
+
+    .tag-stats {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 0.45rem;
+    }
+
+
+    .tag-stat {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 0.45rem;
+
+        padding:
+            0.3rem
+            0.5rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 999px;
+
+        color:
+            var(--sl-color-gray-2);
+
+        font-size: 0.76rem;
+    }
+
+
+    .tag-stat strong {
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.7rem;
+
+        font-variant-numeric:
+            tabular-nums;
+    }
+
+
+    /* =====================================================
+       Drafts
+       ===================================================== */
+
+    .draft-list {
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap: 0.5rem;
+    }
+
+
+    .draft-entry {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        padding:
+            0.55rem
+            0.65rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        border-radius: 0.4rem;
+
+        color:
+            var(--sl-color-gray-1);
+
+        text-decoration: none !important;
+    }
+
+
+    .draft-entry:hover {
+        border-color:
+            var(--sl-color-accent);
+
+        background:
+            var(--sl-color-accent-low);
+    }
+
+
+    .draft-entry code {
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.72rem;
+    }
+
+
+    /* =====================================================
+       Empty
+       ===================================================== */
+
+    .empty-state {
+        padding:
+            1rem;
+
+        border:
+            1px dashed
+            var(--sl-color-hairline);
+
+        border-radius: 0.45rem;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.8rem;
+
+        text-align: center;
+    }
+
+
+    /* =====================================================
+       Responsive
+       ===================================================== */
+
+    @media (
+        max-width: 52rem
+    ) {
+
+        .summary-grid {
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0, 1fr)
+                );
+        }
+
+
+        .reference-source {
+            grid-template-columns:
+                1fr;
+        }
+
+
+        .coverage-list,
+        .stat-list,
+        .draft-list {
+            grid-template-columns:
+                1fr;
+        }
+
+    }
+
+
+
+
+
+    /* =====================================================
+    Reset Starlight prose margins inside statistic groups
+    ===================================================== */
+
+    .summary-grid > *,
+    .coverage-list > *,
+    .stat-list > *,
+    .tag-stats > *,
+    .draft-list > *,
+    .unresolved-list > *,
+    .reference-sources > * {
+        margin: 0 !important;
+    }
+
+
+    .stat-row,
+    .coverage-row {
+        align-self: stretch;
+    }
+
+    .tag-stat {
+        margin: 0 !important;
+        min-height: 2rem;
+    }
+
+    /* =====================================================
+    Unresolved references disclosure
+    ===================================================== */
+
+    .unresolved-details {
+        margin: 0 !important;
+    }
+
+
+    .unresolved-summary {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        box-sizing: border-box;
+
+        margin: 0 !important;
+        padding: 0.7rem 0.8rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        border-radius: 0.45rem;
+
+        color:
+            var(--sl-color-gray-2);
+
+        font-size: 0.8rem;
+
+        cursor: pointer;
+
+        list-style: none;
+
+        transition:
+            border-color 150ms ease,
+            background-color 150ms ease;
+    }
+
+
+    .unresolved-summary::-webkit-details-marker {
+        display: none;
+    }
+
+
+    .unresolved-summary:hover {
+        border-color:
+            var(--sl-color-accent);
+
+        background:
+            var(--sl-color-accent-low);
+    }
+
+
+    .unresolved-summary-closed,
+    .unresolved-summary-open {
+        font-weight: 600;
+    }
+
+
+    .unresolved-summary-open {
+        display: none;
+    }
+
+
+    .unresolved-details[open]
+    .unresolved-summary-closed {
+        display: none;
+    }
+
+
+    .unresolved-details[open]
+    .unresolved-summary-open {
+        display: inline;
+    }
+
+
+    .unresolved-summary-info {
+        margin-left: auto;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.74rem;
+
+        font-variant-numeric:
+            tabular-nums;
+    }
+
+
+    .unresolved-details[open]
+    .unresolved-summary {
+        margin-bottom:
+            0.7rem !important;
+    }
+
+
+    @media (max-width: 40rem) {
+
+        .unresolved-summary {
+            align-items: flex-start;
+            flex-direction: column;
+
+            gap: 0.2rem;
+        }
+
+
+        .unresolved-summary-info {
+            margin-left: 0;
+        }
+
+    }
+
+</style>

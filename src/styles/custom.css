@@ -1657,3 +1657,99 @@ button.entry-tag-button {
     background:
         rgba(39, 60, 71, 0.32);
 }
+
+
+/* Entry Builder: tag chips */
+
+.entry-builder .tag-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+
+    gap: 0.35rem !important;
+
+    padding:
+        0.3rem
+        0.45rem
+        0.3rem
+        0.6rem !important;
+
+    border:
+        1px solid
+        var(--sl-color-hairline) !important;
+
+    border-radius:
+        999px !important;
+
+    background:
+        var(--sl-color-accent-low) !important;
+
+    color:
+        var(--sl-color-gray-1) !important;
+
+    font-size:
+        0.78rem !important;
+}
+
+
+.entry-builder button.tag-chip-remove {
+    appearance: none !important;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 50% !important;
+
+    background:
+        transparent !important;
+
+    color:
+        var(--sl-color-gray-3) !important;
+
+    font: inherit !important;
+    line-height: 1 !important;
+
+    cursor: pointer;
+}
+
+
+.entry-builder button.tag-chip-remove:hover {
+    background:
+        var(--sl-color-accent) !important;
+
+    color:
+        var(--sl-color-black) !important;
+}
+
+
+/* =====================================================
+   Reset Starlight prose margins inside statistic groups
+   ===================================================== */
+
+.summary-grid > *,
+.coverage-list > *,
+.stat-list > *,
+.tag-stats > *,
+.draft-list > *,
+.unresolved-list > *,
+.reference-sources > * {
+    margin: 0 !important;
+}
+
+
+.stat-row,
+.coverage-row {
+    align-self: stretch;
+}
+
+.tag-stat {
+    margin: 0 !important;
+    min-height: 2rem;
+}

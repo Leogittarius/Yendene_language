@@ -955,6 +955,420 @@
     "自然世界"
   ],
   "notes": ""
+},
+{
+  "id": "lam",
+  "headword": "lam",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "波浪",
+      "gloss": "波浪"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [
+    {
+      "source": "Landai | toicaros",
+      "gloss": "波浪-承受 | 汹涌",
+      "translation": "波涛汹涌。"
+    }
+  ],
+  "status": "established",
+  "tags": [
+    "自然世界"
+  ],
+  "notes": ""
+},
+{
+  "id": "sederce",
+  "headword": "sederce",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "星星",
+      "gloss": "星星"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": [
+      "vassederce"
+    ]
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "自然世界"
+  ],
+  "notes": ""
+},
+{
+  "id": "vassederce",
+  "headword": "vassederce",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "星宿，星座",
+      "gloss": "星宿"
+    }
+  ],
+  "formation": {
+    "type": "derived",
+    "analysis": "vas-sederce",
+    "components": [
+      {
+        "ref": "vas-",
+        "form": "vas-"
+      },
+      {
+        "ref": "sederce",
+        "form": "sederce"
+      }
+    ]
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [
+      "sederce"
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "自然世界"
+  ],
+  "notes": ""
+},
+{
+  "id": "vas-",
+  "headword": "vas-",
+  "type": "word",
+  "pos": [
+    "affix"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "【集合化】由多个 N 组成、被视为一个有边界的新整体的集合体或聚集体，但是集\n合前缀应当默认生成“聚集体”，不能自动生成场所或机构，只能引申过去。",
+      "gloss": "集合"
+    }
+  ],
+  "formation": {
+    "type": "root",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [
+      "vassederce"
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
+},
+{
+  "id": "wallese",
+  "headword": "wallese",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "草，低矮植被",
+      "gloss": "草"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": [
+      "vasuallese"
+    ]
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "自然世界"
+  ],
+  "notes": ""
+},
+{
+  "id": "vasuallese",
+  "headword": "vasuallese",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "草丛",
+      "gloss": "草丛"
+    }
+  ],
+  "formation": {
+    "type": "derived",
+    "analysis": "vas-ualelse",
+    "components": [
+      {
+        "ref": "vas-",
+        "form": "vas-"
+      },
+      {
+        "ref": "wallese",
+        "form": "uallese"
+      }
+    ]
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [
+      "wallese"
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "自然世界"
+  ],
+  "notes": ""
+},
+{
+  "id": "shirfe",
+  "headword": "shirfe",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "战争",
+      "gloss": "战争"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [
+      "dzimbile",
+      "dzimbila"
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": [
+      "falloshirfe"
+    ]
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "战争"
+  ],
+  "notes": ""
+},
+{
+  "id": "falloshirfe",
+  "headword": "falloshirfe",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "推演，假想战争",
+      "gloss": "推演"
+    },
+    {
+      "definition": "代理人战争",
+      "gloss": "代理人战争"
+    }
+  ],
+  "formation": {
+    "type": "derived",
+    "analysis": "fallo-shirfe",
+    "components": [
+      {
+        "ref": "fallo-",
+        "form": "fallo-"
+      },
+      {
+        "ref": "shirfe",
+        "form": "shirfe"
+      }
+    ]
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [
+      "shirfe",
+      "shirfolueta",
+      "shirfohadha"
+    ],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "战争"
+  ],
+  "notes": ""
+},
+{
+  "id": "fallo-",
+  "headword": "fallo-",
+  "type": "word",
+  "pos": [
+    "affix"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "【拟似／伪冒／非真正成员】表示在外形、功能、名称、身份或宣传上类似 N，却不完全具备成为真正 N 的条件。这个前缀的核心不是“质量差”，而是类别资格不真实或不完整。",
+      "gloss": "拟似"
+    }
+  ],
+  "formation": {
+    "type": "root",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": [
+      "falloshirfe"
+    ]
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
+},
+{
+  "id": "-icle",
+  "headword": "-icle",
+  "type": "affix",
+  "pos": [
+    "affix"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "【职业或制度性角色者】表示以该活动为职业、职务或稳定社会角色的人，如医师、教师、管理人员等，也就是说，更具社会意味，强调施动人的身份。",
+      "gloss": "职业"
+    }
+  ],
+  "formation": {
+    "type": "root",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": [
+      "seticle"
+    ]
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
 }
     
   ]
