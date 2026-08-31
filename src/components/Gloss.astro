@@ -2,7 +2,7 @@
 interface Props {
     source: string;
     gloss: string;
-    translation: string;
+    translation?: string;
     number?: string | number;
 }
 
@@ -56,9 +56,13 @@ const items = Array.from({ length: itemCount }, (_, index) => ({
                 }
             </div>
 
-            <figcaption class="gloss-translation">
-                “{translation}”
-            </figcaption>
+            {
+                translation && (
+                    <figcaption class="gloss-translation">
+                        “{translation}”
+                    </figcaption>
+                )
+            }
         </div>
     </div>
 </figure>

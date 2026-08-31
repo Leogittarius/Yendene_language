@@ -83,7 +83,16 @@
         "type": "derived",
         "analysis": "ma-talge",
 
-        "components": []
+        "components": [
+            {
+                "ref": "ma-",
+                "form":"ma"
+            },
+            {
+                "ref": "talge",
+                "form":"talge"
+            }
+        ]
       },
 
       "etymology": "",
@@ -378,6 +387,111 @@
       "tags": [],
 
       "notes": ""
+    },
+    {
+      "id": "tacce",
+      "headword": "tacce",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "城市，城邦",
+          "gloss": "城市"
+        }
+      ],
+
+      "formation": {
+        "type": "root",
+        "components": []
+      },
+
+      "etymology": "",
+
+      "variants": [],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [{
+          "source": "Siecofainso  | tacco | dhepangia.",
+          "gloss": "今晚-方位 | 城市-方位 | 睡觉",
+          "translation": "我今晚在城市里睡觉。"
+        }],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
+    },
+    {
+      "id": "ma-",
+      "headword": "ma-",
+
+      "type": "simple",
+
+      "pos": [
+        "affix"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "增大／强化，其核心含义是更大、更强、更显著或更具威势的版本。有的时候会引申出来一定的褒义。"
+        }
+      ],
+
+      "formation": {
+        "type": "simple",
+        "components": []
+      },
+
+      "etymology": "",
+
+      "variants": [],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [
+        {
+          "source": "sentoisce  | masentoisce",
+          "gloss": "房子 | 府邸",
+          "translation": ""
+        },
+        {
+          "source": "tecapes  | matecapes",
+          "gloss": "火 | 烈火"
+        }
+    ],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
     }
+
+    
   ]
 }

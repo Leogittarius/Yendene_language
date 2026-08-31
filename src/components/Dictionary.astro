@@ -357,14 +357,54 @@ function getFormationLabel(type) {
 
                                 {
                                     entry.formation.components?.length > 0 && (
-                                        <div class="components">
-                                            {
-                                                entry.formation.components.map((component) => (
-                                                    <span class="component">
-                                                        {component.form}
-                                                    </span>
-                                                ))
-                                            }
+                                        <div class="component-row">
+
+                                            <span class="component-label">
+                                                构成
+                                            </span>
+
+                                            <div class="components">
+                                                {
+                                                    entry.formation.components.map((component) => {
+
+                                                        const target =
+                                                            component.ref
+                                                                ? entryMap.get(component.ref)
+                                                                : undefined;
+
+                                                        if (target) {
+                                                            return (
+                                                                <a
+                                                                    class="component component-link"
+                                                                    href={`#${target.id}`}
+                                                                    data-relation-link={target.id}
+                                                                >
+                                                                    {component.form}
+                                                                </a>
+                                                            );
+                                                        }
+
+                                                        if (component.ref) {
+                                                            return (
+                                                                <span
+                                                                    class="component component-unresolved"
+                                                                    title={`未找到词条 ID：${component.ref}`}
+                                                                >
+                                                                    {component.form}
+                                                                </span>
+                                                            );
+                                                        }
+
+                                                        return (
+                                                            <span class="component">
+                                                                {component.form}
+                                                            </span>
+                                                        );
+
+                                                    })
+                                                }
+                                            </div>
+
                                         </div>
                                     )
                                 }
@@ -724,19 +764,107 @@ function getFormationLabel(type) {
         font-size: 0.9rem;
     }
 
+
+    .component-row {
+        display: grid;
+        grid-template-columns: 3.5rem minmax(0, 1fr);
+        align-items: start;
+
+        gap: 0.7rem;
+
+        margin-top: 0.55rem !important;
+    }
+
+    .component-label {
+        padding-top: 0.2rem;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.82rem;
+        font-weight: 550;
+
+        white-space: nowrap;
+    }
+
+
     .components {
         display: flex;
         flex-wrap: wrap;
+        align-items: center;
 
         gap: 0.4rem;
 
-        margin-top: 0.5rem;
+        margin-top: 0 !important;
     }
 
     .component {
+        display: inline-flex;
+        align-items: center;
+
+        margin: 0 !important;
+
         color: var(--sl-color-gray-2);
 
         font-size: 0.88rem;
+    }
+
+    .component-link {
+        padding:
+            0.18rem
+            0.45rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.35rem;
+
+        color: var(--sl-color-accent-high);
+
+        font-weight: 550;
+
+        text-decoration: none !important;
+
+        transition:
+            background-color 150ms ease,
+            border-color 150ms ease,
+            color 150ms ease;
+    }
+
+    .component-link::after {
+        content: '→';
+
+        margin-left: 0.3rem;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.78rem;
+    }
+
+    .component-link:hover {
+        border-color:
+            var(--sl-color-accent);
+
+        background:
+            var(--sl-color-accent-low);
+
+        color:
+            var(--sl-color-accent-high);
+    }
+
+    .component-unresolved {
+        padding:
+            0.18rem
+            0.45rem;
+
+        border:
+            1px dashed
+            var(--sl-color-hairline);
+
+        border-radius: 0.35rem;
+
+        color:
+            var(--sl-color-gray-3);
     }
 
 
