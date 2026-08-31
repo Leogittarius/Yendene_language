@@ -793,6 +793,127 @@
   "status": "established",
   "tags": [],
   "notes": ""
+},
+{
+  "id": "lin",
+  "headword": "līn",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "羊",
+      "gloss": "羊"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "动物"
+  ],
+  "notes": ""
+},
+{
+  "id": "seta",
+  "headword": "sēta",
+  "type": "word",
+  "pos": [
+    "verb"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "教，教授，教导",
+      "gloss": "教"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
+},
+{
+  "id": "seticle",
+  "headword": "sēticle",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "教师，老师",
+      "gloss": "教师"
+    }
+  ],
+  "formation": {
+    "type": "derived",
+    "analysis": "sēt-icle",
+    "components": [
+      {
+        "ref": "seta",
+        "form": "sēt"
+      },
+      {
+        "ref": "-icle",
+        "form": "-icle"
+      }
+    ]
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [
+    {
+      "source": "Sēticle | sētustiten | bāfi | sētavi",
+      "gloss": "教师-施事 | 学生-受益 |  书本-客体 | 教",
+      "translation": "老师给学生们讲解教材。"
+    }
+  ],
+  "status": "established",
+  "tags": [
+    "职业"
+  ],
+  "notes": ""
 }
     
   ]

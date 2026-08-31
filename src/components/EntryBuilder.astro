@@ -26,6 +26,8 @@ const lookupEntries = dictionary.entries.map((entry) => ({
                 : variant.form
         )
         .filter(Boolean),
+
+    tags: entry.tags ?? [],
 }));
 
 const lookupJson =
@@ -332,6 +334,77 @@ const lookupJson =
             <div id="eb-example-list"></div>
 
         </section>
+
+
+        <!-- =====================================
+         Tags
+        ===================================== -->
+
+        <section class="builder-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>标签</h2>
+
+                    <span class="field-help">
+                        可以搜索并选择词典中已有的标签，
+                        也可以直接创建新标签。
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="tag-editor">
+
+                <div
+                    id="eb-tag-list"
+                    class="tag-list"
+                ></div>
+
+
+                <div class="tag-picker">
+
+                    <div class="tag-input-row">
+
+                        <input
+                            id="eb-tag-input"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="输入标签……"
+                        />
+
+                        <button
+                            id="eb-add-tag"
+                            class="small-button"
+                            type="button"
+                        >
+                            添加
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="eb-tag-suggestions"
+                        class="tag-suggestions"
+                        hidden
+                    ></div>
+
+                </div>
+
+
+                <span class="field-help">
+                    按 Enter 或点击“添加”可以创建新标签；
+                    已有标签会优先显示为搜索结果。
+                </span>
+
+            </div>
+
+        </section>
+
+
 
         <!-- =====================================
              Other
@@ -988,6 +1061,196 @@ const lookupJson =
 
     }
 
+
+
+    /* ========================================
+    Tags
+    ======================================== */
+
+    .entry-builder .tag-editor {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+
+    .entry-builder .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 0.45rem;
+
+        min-height: 0.5rem;
+    }
+
+
+    .entry-builder .tag-chip {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 0.35rem;
+
+        padding:
+            0.3rem
+            0.5rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 999px;
+
+        background:
+            var(--sl-color-accent-low);
+
+        color:
+            var(--sl-color-gray-1);
+
+        font-size: 0.78rem;
+    }
+
+
+    .entry-builder .tag-chip-remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 1rem;
+        height: 1rem;
+
+        margin: 0 !important;
+        padding: 0;
+
+        border: 0;
+
+        background: transparent;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font: inherit;
+        line-height: 1;
+
+        cursor: pointer;
+    }
+
+
+    .entry-builder .tag-chip-remove:hover {
+        color:
+            var(--sl-color-white);
+    }
+
+
+    .entry-builder .tag-picker {
+        position: relative;
+    }
+
+
+    .entry-builder .tag-input-row {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+
+        gap: 0.5rem;
+    }
+
+
+    .entry-builder .tag-suggestions {
+        position: absolute;
+
+        z-index: 40;
+
+        top: calc(100% + 0.3rem);
+        left: 0;
+        right: 0;
+
+        max-height: 18rem;
+
+        overflow-y: auto;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.42rem;
+
+        background:
+            var(--sl-color-bg);
+
+        box-shadow:
+            0 0.5rem 1.5rem
+            rgba(0, 0, 0, 0.14);
+    }
+
+
+    .entry-builder .tag-suggestions[hidden] {
+        display: none !important;
+    }
+
+
+    .entry-builder .tag-suggestion {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 1rem;
+
+        width: 100%;
+
+        margin: 0 !important;
+        padding:
+            0.55rem
+            0.65rem;
+
+        border: 0;
+
+        border-bottom:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        background: transparent;
+
+        color:
+            var(--sl-color-gray-1);
+
+        text-align: left;
+
+        font: inherit;
+
+        cursor: pointer;
+    }
+
+
+    .entry-builder .tag-suggestion:last-child {
+        border-bottom: 0;
+    }
+
+
+    .entry-builder .tag-suggestion:hover {
+        background:
+            var(--sl-color-accent-low);
+    }
+
+
+    .entry-builder .tag-suggestion-count {
+        flex: none;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.72rem;
+    }
+
+
+    .entry-builder .tag-create {
+        color:
+            var(--sl-color-accent-high);
+    }
+
+
+
+
 </style>
 
 
@@ -1545,6 +1808,27 @@ const lookupJson =
         const addExampleButton =
             root.querySelector(
                 '#eb-add-example'
+            );
+
+
+        const tagList =
+            root.querySelector(
+                '#eb-tag-list'
+            );
+
+        const tagInput =
+            root.querySelector(
+                '#eb-tag-input'
+            );
+
+        const addTagButton =
+            root.querySelector(
+                '#eb-add-tag'
+            );
+
+        const tagSuggestions =
+            root.querySelector(
+                '#eb-tag-suggestions'
             );
 
         const output =
@@ -4406,6 +4690,512 @@ const lookupJson =
 
         }
 
+
+
+
+        /* =====================================
+           Tags
+           ===================================== */
+
+
+        /*
+         * 统计现有词典中每个标签使用了多少次。
+         *
+         * 例如：
+         *
+         * 动物 → 12
+         * 哺乳动物 → 5
+         */
+        const existingTagCounts =
+            new Map();
+
+
+        existingEntries.forEach(
+            (entry) => {
+
+                (entry.tags ?? [])
+                    .forEach(
+                        (tag) => {
+
+                            const cleanTag =
+                                String(tag).trim();
+
+
+                            if (!cleanTag) {
+                                return;
+                            }
+
+
+                            existingTagCounts.set(
+                                cleanTag,
+
+                                (
+                                    existingTagCounts.get(
+                                        cleanTag
+                                    ) ?? 0
+                                ) + 1
+                            );
+
+                        }
+                    );
+
+            }
+        );
+
+
+        /*
+         * 得到全部已有标签，
+         * 同时去重。
+         */
+        const existingTags =
+            Array.from(
+                existingTagCounts.keys()
+            )
+            .sort(
+                (a, b) =>
+                    a.localeCompare(
+                        b,
+                        'zh-CN'
+                    )
+            );
+
+
+        /*
+         * 得到当前已经添加到新词条的标签。
+         */
+        function getTags() {
+
+            return Array.from(
+                tagList.querySelectorAll(
+                    '.tag-chip'
+                )
+            )
+            .map(
+                (chip) =>
+                    chip.dataset.tag
+            )
+            .filter(Boolean);
+
+        }
+
+
+        /*
+         * 某个标签当前是否已经被选中。
+         */
+        function hasTag(tag) {
+
+            return getTags()
+                .includes(tag);
+
+        }
+
+
+        /*
+         * 增加一个标签。
+         */
+        function addTag(rawTag) {
+
+            const tag =
+                String(rawTag)
+                    .trim();
+
+
+            if (!tag) {
+                return;
+            }
+
+
+            /*
+             * 已有相同标签则不重复添加。
+             */
+            if (hasTag(tag)) {
+
+                tagInput.value = '';
+
+                tagSuggestions.hidden =
+                    true;
+
+                return;
+
+            }
+
+
+            const chip =
+                document.createElement(
+                    'span'
+                );
+
+
+            chip.className =
+                'tag-chip';
+
+            chip.dataset.tag =
+                tag;
+
+
+            const text =
+                document.createElement(
+                    'span'
+                );
+
+            text.textContent =
+                tag;
+
+
+            const removeButton =
+                document.createElement(
+                    'button'
+                );
+
+            removeButton.type =
+                'button';
+
+            removeButton.className =
+                'tag-chip-remove';
+
+            removeButton.setAttribute(
+                'aria-label',
+                `删除标签 ${tag}`
+            );
+
+            removeButton.textContent =
+                '×';
+
+
+            chip.append(
+                text,
+                removeButton
+            );
+
+
+            tagList.appendChild(
+                chip
+            );
+
+
+            tagInput.value =
+                '';
+
+            tagSuggestions.hidden =
+                true;
+
+
+            update();
+
+        }
+
+
+        /*
+         * 根据输入内容显示已有标签。
+         *
+         * 最多显示 8 个结果。
+         */
+        function renderTagSuggestions() {
+
+            const rawQuery =
+                tagInput.value.trim();
+
+
+            const query =
+                normalizeSearch(
+                    rawQuery
+                );
+
+
+            tagSuggestions.innerHTML =
+                '';
+
+
+            if (!query) {
+
+                tagSuggestions.hidden =
+                    true;
+
+                return;
+
+            }
+
+
+            const matches =
+                existingTags
+
+                    .filter(
+                        (tag) =>
+                            normalizeSearch(tag)
+                                .includes(query)
+                    )
+
+                    .filter(
+                        (tag) =>
+                            !hasTag(tag)
+                    )
+
+                    .slice(0, 8);
+
+
+            matches.forEach(
+                (tag) => {
+
+                    const button =
+                        document.createElement(
+                            'button'
+                        );
+
+
+                    button.type =
+                        'button';
+
+                    button.className =
+                        'tag-suggestion';
+
+
+                    const name =
+                        document.createElement(
+                            'span'
+                        );
+
+                    name.textContent =
+                        tag;
+
+
+                    const count =
+                        document.createElement(
+                            'span'
+                        );
+
+                    count.className =
+                        'tag-suggestion-count';
+
+
+                    const usageCount =
+                        existingTagCounts.get(
+                            tag
+                        ) ?? 0;
+
+
+                    count.textContent =
+                        `${usageCount} 个词条`;
+
+
+                    button.append(
+                        name,
+                        count
+                    );
+
+
+                    button.addEventListener(
+                        'click',
+                        () => {
+
+                            addTag(tag);
+
+                        }
+                    );
+
+
+                    tagSuggestions.appendChild(
+                        button
+                    );
+
+                }
+            );
+
+
+            /*
+             * 如果输入的内容不是已有标签，
+             * 最下面允许直接创建新标签。
+             */
+            const exactExisting =
+                existingTags.some(
+                    (tag) =>
+                        tag === rawQuery
+                );
+
+
+            const alreadySelected =
+                hasTag(rawQuery);
+
+
+            if (
+                rawQuery &&
+                !exactExisting &&
+                !alreadySelected
+            ) {
+
+                const createButton =
+                    document.createElement(
+                        'button'
+                    );
+
+
+                createButton.type =
+                    'button';
+
+                createButton.className =
+                    'tag-suggestion tag-create';
+
+
+                const text =
+                    document.createElement(
+                        'span'
+                    );
+
+                text.textContent =
+                    `＋ 创建标签 “${rawQuery}”`;
+
+
+                createButton.appendChild(
+                    text
+                );
+
+
+                createButton.addEventListener(
+                    'click',
+                    () => {
+
+                        addTag(
+                            rawQuery
+                        );
+
+                    }
+                );
+
+
+                tagSuggestions.appendChild(
+                    createButton
+                );
+
+            }
+
+
+            tagSuggestions.hidden =
+                tagSuggestions.children.length ===
+                0;
+
+        }
+
+
+        /*
+         * 输入标签时实时搜索。
+         */
+        tagInput.addEventListener(
+            'input',
+            () => {
+
+                renderTagSuggestions();
+
+            }
+        );
+
+
+        /*
+         * 按 Enter：
+         *
+         * 直接添加当前输入内容。
+         */
+        tagInput.addEventListener(
+            'keydown',
+            (event) => {
+
+                if (
+                    event.key !== 'Enter'
+                ) {
+                    return;
+                }
+
+
+                event.preventDefault();
+
+
+                addTag(
+                    tagInput.value
+                );
+
+            }
+        );
+
+
+        /*
+         * 点击“添加”按钮。
+         */
+        addTagButton.addEventListener(
+            'click',
+            () => {
+
+                addTag(
+                    tagInput.value
+                );
+
+            }
+        );
+
+
+        /*
+         * 删除已经加入的标签。
+         */
+        tagList.addEventListener(
+            'click',
+            (event) => {
+
+                const removeButton =
+                    event.target.closest(
+                        '.tag-chip-remove'
+                    );
+
+
+                if (!removeButton) {
+                    return;
+                }
+
+
+                const chip =
+                    removeButton.closest(
+                        '.tag-chip'
+                    );
+
+
+                chip?.remove();
+
+
+                update();
+
+            }
+        );
+
+
+        /*
+         * 点击 Tags 区域以外时，
+         * 关闭搜索结果。
+         */
+        document.addEventListener(
+            'click',
+            (event) => {
+
+                if (
+                    event.target.closest(
+                        '.tag-picker'
+                    )
+                ) {
+                    return;
+                }
+
+
+                tagSuggestions.hidden =
+                    true;
+
+            }
+        );
+
+
+
+
+
+
+
+
+
+
+
         /* =====================================
            Build JSON
            ===================================== */
@@ -4573,7 +5363,7 @@ const lookupJson =
                 status:
                     status.value,
 
-                tags: [],
+                tags: getTags(),
 
                 notes:
                     notes.value.trim()
