@@ -331,6 +331,53 @@
       "tags": [],
 
       "notes": ""
+    },
+    {
+      "id": "cumlolle",
+      "headword": "cumlolle",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "勇者，勇士，有胆气的人",
+          "gloss": "勇者"
+        }
+      ],
+
+      "formation": {
+        "type": "derived",
+        "analysis": "cuml-olle",
+
+        "components": []
+      },
+
+      "etymology": "",
+
+      "variants": [],
+
+      "relations": {
+        "related": [],
+        "synonyms": ["matalge"],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
     }
   ]
 }

@@ -60,20 +60,70 @@ function getSearchText(entry) {
 }
 
 
-const posLabels = {
-    noun: '名词',
-    verb: '动词',
-    'state-verb': '状态动词',
-    adjective: '形容词',
-    adverb: '副词',
-    pronoun: '代词',
-    numeral: '数词',
-    particle: '助词',
-    conjunction: '连词',
-    adposition: '介词 / 后置词',
-    modal: '情态词',
-    classifier: '量词',
+const posInfo = {
+    noun: {
+        abbr: 'n.',
+        label: '普通名词'
+    },
+    verb: {
+        abbr: 'v.',
+        label: '普通动态动词'
+    },
+    stative: {
+        abbr: 'stat.',
+        label: '状态动词'
+    },
+    numeral: {
+        abbr: 'num.',
+        label: '数量状态动词'
+    },
+    pronoun: {
+        abbr: 'pron.',
+        label: '代词'
+    },
+    function: {
+        abbr: 'func.',
+        label: '普通功能词'
+    },
+    lightverb: {
+        abbr: 'lv.',
+        label: '轻动词'
+    },
+    particle: {
+        abbr: 'part.',
+        label: '构式粒子'
+    },
+    affix: {
+        abbr: 'aff.',
+        label: '普通派生词缀'
+    },
+    converb: {
+        abbr: 'conv.',
+        label: '副动词后缀'
+    }
 };
+
+function getPosInfo(pos) {
+    return posInfo[pos] ?? {
+        abbr: pos,
+        label: pos
+    };
+}
+
+const posOrder = [
+    'noun',
+    'verb',
+    'stative',
+    'numeral',
+    'pronoun',
+    'function',
+    'lightverb',
+    'particle',
+    'affix',
+    'converb'
+];
+
+const availablePos = posOrder;
 
 const formationLabels = {
     root: '词根',
@@ -86,8 +136,49 @@ const formationLabels = {
     borrowed: '借词',
 };
 
-function getPosLabel(pos) {
-    return posLabels[pos] ?? pos;
+
+
+const relationInfo = [
+    {
+        key: 'related',
+        label: '相关词'
+    },
+    {
+        key: 'synonyms',
+        label: '同义/近义'
+    },
+    {
+        key: 'antonyms',
+        label: '反义词'
+    },
+    {
+        key: 'derived',
+        label: '派生词'
+    }
+];
+
+const entryMap = new Map(
+    entries.map((entry) => [
+        entry.id,
+        entry
+    ])
+);
+
+function getRelationGroups(entry) {
+    return relationInfo
+        .map((relation) => ({
+            key: relation.key,
+            label: relation.label,
+            refs:
+                entry.relations?.[relation.key] ?? []
+        }))
+        .filter((group) =>
+            group.refs.length > 0
+        );
+}
+
+function hasRelations(entry) {
+    return getRelationGroups(entry).length > 0;
 }
 
 function getFormationLabel(type) {
@@ -110,6 +201,42 @@ function getFormationLabel(type) {
             placeholder="搜索词形、释义、变体、标签……"
             autocomplete="off"
         />
+
+        <div
+            class="pos-filters"
+            role="group"
+            aria-label="按词性筛选"
+        >
+            <button
+            type="button"
+            class="pos-filter is-active"
+            data-pos-filter="all"
+            aria-pressed="true"
+        >
+            <span class="pos-filter-label">
+                全部
+            </span>
+        </button>
+
+            {
+                availablePos.map((pos) => (
+                    <button
+                        type="button"
+                        class="pos-filter"
+                        data-pos-filter={pos}
+                        aria-pressed="false"
+                    >
+                        <span class="pos-filter-abbr">
+                            {getPosInfo(pos).abbr}
+                        </span>
+
+                        <span class="pos-filter-label">
+                            {getPosInfo(pos).label}
+                        </span>
+                    </button>
+                ))
+            }
+        </div>
 
         <div class="dictionary-summary">
             当前显示
@@ -139,6 +266,7 @@ function getFormationLabel(type) {
                     id={entry.id}
                     data-dictionary-entry
                     data-search={getSearchText(entry)}
+                    data-pos={entry.pos.join(' ')}
                 >
 
                     <header class="entry-header">
@@ -150,8 +278,11 @@ function getFormationLabel(type) {
                             <div class="entry-meta">
                                 {
                                     entry.pos.map((pos) => (
-                                        <span class="pos">
-                                            {getPosLabel(pos)}
+                                        <span
+                                            class="pos"
+                                            title={getPosInfo(pos).label}
+                                        >
+                                            {getPosInfo(pos).abbr}
                                         </span>
                                     ))
                                 }
@@ -280,7 +411,53 @@ function getFormationLabel(type) {
                         )
                     }
 
+                    {
+                        hasRelations(entry) && (
+                            <section class="entry-section relations-section">
+                                <h3>词汇关系</h3>
 
+                                <div class="relation-groups">
+                                    {
+                                        getRelationGroups(entry).map((group) => (
+                                            <div class="relation-group">
+
+                                                <span class="relation-label">
+                                                    {group.label}
+                                                </span>
+
+                                                <div class="relation-links">
+                                                    {
+                                                        group.refs.map((ref) => {
+                                                            const target =
+                                                                entryMap.get(ref);
+
+                                                            return target ? (
+                                                                <a
+                                                                    class="relation-link"
+                                                                    href={`#${target.id}`}
+                                                                    data-relation-link={target.id}
+                                                                >
+                                                                    {target.headword}
+                                                                </a>
+                                                            ) : (
+                                                                <span
+                                                                    class="relation-link unresolved"
+                                                                    title={`未找到词条 ID：${ref}`}
+                                                                >
+                                                                    {ref}
+                                                                </span>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </section>
+                        )
+                    }
                     {
                         entry.tags?.length > 0 && (
                             <section class="entry-section">
@@ -342,17 +519,6 @@ function getFormationLabel(type) {
         margin-top: 1.5rem;
     }
 
-
-    /* ========================================
-       Summary
-       ======================================== */
-
-    .dictionary-summary {
-        margin-bottom: 1.8rem;
-
-        color: var(--sl-color-gray-2);
-        font-size: 0.92rem;
-    }
 
 
     /* ========================================
@@ -605,7 +771,125 @@ function getFormationLabel(type) {
         font-size: 0.85rem;
     }
 
+    /* ========================================
+   Relations
+   ======================================== */
 
+    .relation-groups {
+        display: grid;
+
+        gap: 0.65rem;
+
+        margin: 0 !important;
+    }
+
+    .relation-group {
+        display: grid;
+
+        grid-template-columns:
+            4.5rem
+            minmax(0, 1fr);
+
+        align-items: start;
+
+        gap: 0.7rem;
+
+        margin: 0 !important;
+    }
+
+    .relation-label {
+        padding-top: 0.2rem;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.82rem;
+        font-weight: 550;
+
+        white-space: nowrap;
+    }
+
+    .relation-links {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 0.4rem;
+
+        margin: 0 !important;
+    }
+
+    .relation-link {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 0.3rem;
+
+        margin: 0 !important;
+        padding:
+            0.2rem
+            0.5rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.35rem;
+
+        color: var(--sl-color-accent-high);
+
+        font-size: 0.86rem;
+        font-weight: 550;
+
+        text-decoration: none !important;
+
+        transition:
+            background-color 150ms ease,
+            border-color 150ms ease,
+            color 150ms ease;
+    }
+
+    .relation-link::after {
+        content: '→';
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.8rem;
+    }
+
+    .relation-link:hover {
+        border-color: var(--sl-color-accent);
+
+        background:
+            var(--sl-color-accent-low);
+
+        color: var(--sl-color-accent-high);
+    }
+
+    .relation-link.unresolved {
+        border-style: dashed;
+
+        color: var(--sl-color-gray-3);
+
+        cursor: help;
+    }
+
+    .relation-link.unresolved::after {
+        content: '';
+    }
+
+
+    @media (max-width: 40rem) {
+
+        .relation-group {
+            grid-template-columns: 1fr;
+
+            gap: 0.3rem;
+        }
+
+        .relation-label {
+            padding-top: 0;
+        }
+
+    }
     /* ========================================
        Tags
        ======================================== */
@@ -751,6 +1035,83 @@ function getFormationLabel(type) {
 }
 
 
+/* ========================================
+   Part-of-speech filters
+   ======================================== */
+
+    .pos-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+
+        gap: 0.45rem;
+
+        margin-top: 0.8rem;
+    }
+    .pos-filter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.35rem;
+
+        box-sizing: border-box;
+        height: 2.25rem;
+        padding: 0 0.65rem;
+
+        margin: 0 !important;
+
+        border: 1px solid var(--sl-color-hairline);
+        border-radius: 0.4rem;
+
+        background: transparent;
+        color: var(--sl-color-gray-2);
+
+        font: inherit;
+        font-size: 0.8rem;
+        line-height: 1;
+
+        appearance: none;
+        -webkit-appearance: none;
+
+        cursor: pointer;
+
+        transition:
+            background-color 150ms ease,
+            border-color 150ms ease,
+            color 150ms ease;
+    }
+
+    .pos-filter-abbr {
+        font-weight: 650;
+        line-height: 1;
+    }
+
+    .pos-filter-label {
+        font-size: 0.76rem;
+        line-height: 1;
+    }
+
+    .pos-filter:hover {
+        border-color: var(--sl-color-accent);
+        color: var(--sl-color-white);
+    }
+
+    .pos-filter.is-active {
+        border-color: var(--sl-color-accent);
+        background: var(--sl-color-accent-low);
+        color: var(--sl-color-accent-high);
+    }
+
+    :root[data-theme='light'] .pos-filter {
+        background: #f8fbfc;
+    }
+
+    :root[data-theme='light'] .pos-filter.is-active {
+        background: #e7f3f9;
+    }
+
+
 
 
 </style>
@@ -771,6 +1132,23 @@ function getFormationLabel(type) {
                     '[data-dictionary-entry]'
                 )
             );
+
+        const filters =
+            Array.from(
+                dictionary.querySelectorAll(
+                    '[data-pos-filter]'
+                )
+            );
+
+        const relationLinks =
+            Array.from(
+                dictionary.querySelectorAll(
+                    '[data-relation-link]'
+                )
+            );
+
+
+        let activePos = 'all';
 
         const count =
             dictionary.querySelector(
@@ -804,11 +1182,23 @@ function getFormationLabel(type) {
                 const searchText =
                     entry.dataset.search ?? '';
 
-                const matches =
+                const matchesSearch =
                     terms.length === 0 ||
                     terms.every((term) =>
                         searchText.includes(term)
                     );
+
+                const entryPos =
+                    (entry.dataset.pos ?? '')
+                        .split(/\s+/)
+                        .filter(Boolean);
+
+                const matchesPos =
+                    activePos === 'all' ||
+                    entryPos.includes(activePos);
+
+                const matches =
+                    matchesSearch && matchesPos;
 
                 entry.hidden = !matches;
 
@@ -825,6 +1215,117 @@ function getFormationLabel(type) {
         };
 
         input.addEventListener('input', update);
+
+        filters.forEach((filter) => {
+            filter.addEventListener('click', () => {
+                activePos =
+                    filter.dataset.posFilter ?? 'all';
+
+                filters.forEach((button) => {
+                    const isActive =
+                        button === filter;
+
+                    button.classList.toggle(
+                        'is-active',
+                        isActive
+                    );
+
+                    button.setAttribute(
+                        'aria-pressed',
+                        String(isActive)
+                    );
+                });
+
+                update();
+            });
+        });
+
+            relationLinks.forEach((link) => {
+
+                link.addEventListener('click', (event) => {
+
+                    const targetId =
+                        link.dataset.relationLink;
+
+                    if (!targetId) return;
+
+                    const target =
+                        document.getElementById(targetId);
+
+                    if (!target) return;
+
+                    event.preventDefault();
+
+
+                    /* 清空搜索 */
+
+                    input.value = '';
+
+
+                    /* 重置词性筛选 */
+
+                    activePos = 'all';
+
+                    filters.forEach((button) => {
+
+                        const isAll =
+                            button.dataset.posFilter === 'all';
+
+                        button.classList.toggle(
+                            'is-active',
+                            isAll
+                        );
+
+                        button.setAttribute(
+                            'aria-pressed',
+                            String(isAll)
+                        );
+
+                    });
+
+
+                    /* 重新显示词条 */
+
+                    update();
+
+
+                    /* 等待页面更新后跳转 */
+
+                    requestAnimationFrame(() => {
+
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+
+                        history.replaceState(
+                            null,
+                            '',
+                            `#${targetId}`
+                        );
+
+
+                        /* 临时高亮目标词条 */
+
+                        target.classList.add(
+                            'relation-target'
+                        );
+
+                        window.setTimeout(() => {
+
+                            target.classList.remove(
+                                'relation-target'
+                            );
+
+                        }, 1200);
+
+                    });
+
+                });
+
+            });
+
+
 
         update();
     }

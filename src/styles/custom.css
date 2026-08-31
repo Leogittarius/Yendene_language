@@ -358,3 +358,12 @@ header a[href="/"] {
 :root[data-theme='dark'] header a[href="/"] {
     color: #79bddd;
 }
+
+
+/* ========================================
+   Dictionary page layout
+   ======================================== */
+
+body:has(.dictionary) {
+    --sl-content-width: 68rem;
+}
