@@ -1231,3 +1231,429 @@ body:has(.entry-builder) {
 
     cursor: pointer;
 }
+
+
+/* =========================================================
+   Dictionary Tags
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   Tag filter area
+   --------------------------------------------------------- */
+
+.dictionary .dictionary-tag-filter {
+    margin-top: 1rem;
+}
+
+
+.dictionary .dictionary-filter-label {
+    display: block;
+
+    margin-bottom: 0.4rem;
+
+    color: var(--sl-color-gray-2);
+
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+
+/* ---------------------------------------------------------
+   Tag search
+   --------------------------------------------------------- */
+
+.dictionary .dictionary-tag-picker {
+    position: relative;
+
+    width: min(28rem, 100%);
+}
+
+
+.dictionary .dictionary-tag-search {
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 2.45rem;
+
+    margin: 0 !important;
+    padding: 0 0.7rem;
+
+    border:
+        1px solid
+        var(--sl-color-hairline);
+
+    border-radius: 0.45rem;
+
+    background:
+        var(--sl-color-bg);
+
+    color:
+        var(--sl-color-white);
+
+    font: inherit;
+    font-size: 0.85rem;
+
+    outline: none;
+
+    transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease;
+}
+
+
+.dictionary .dictionary-tag-search:focus {
+    border-color:
+        var(--sl-color-accent);
+
+    box-shadow:
+        0 0 0 2px
+        var(--sl-color-accent-low);
+}
+
+
+:root[data-theme='light']
+.dictionary .dictionary-tag-search {
+    background: #f8fbfc;
+
+    border-color: #ccdce4;
+}
+
+
+:root[data-theme='dark']
+.dictionary .dictionary-tag-search {
+    background: #101f27;
+
+    border-color: #2a414d;
+}
+
+
+/* ---------------------------------------------------------
+   Aggregated tag dropdown
+   --------------------------------------------------------- */
+
+.dictionary .dictionary-tag-options {
+    position: absolute;
+
+    z-index: 100;
+
+    top: calc(100% + 0.35rem);
+
+    left: 0;
+    right: 0;
+
+    max-height: 20rem;
+
+    overflow-y: auto;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border:
+        1px solid
+        var(--sl-color-hairline);
+
+    border-radius: 0.5rem;
+
+    background:
+        var(--sl-color-bg);
+
+    box-shadow:
+        0
+        0.65rem
+        1.6rem
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.dictionary
+.dictionary-tag-options[hidden] {
+    display: none !important;
+}
+
+
+.dictionary
+button.dictionary-tag-option {
+    appearance: none;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+
+    box-sizing: border-box;
+
+    width: 100%;
+
+    margin: 0 !important;
+    padding:
+        0.58rem
+        0.7rem;
+
+    border: 0;
+
+    border-bottom:
+        1px solid
+        var(--sl-color-hairline-light);
+
+    border-radius: 0;
+
+    background:
+        transparent;
+
+    color:
+        var(--sl-color-gray-1);
+
+    font: inherit;
+    font-size: 0.8rem;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+
+.dictionary
+button.dictionary-tag-option:last-child {
+    border-bottom: 0;
+}
+
+
+.dictionary
+button.dictionary-tag-option:hover {
+    background:
+        var(--sl-color-accent-low);
+
+    color:
+        var(--sl-color-white);
+}
+
+
+.dictionary
+.dictionary-tag-option-name {
+    min-width: 0;
+
+    font-weight: 550;
+}
+
+
+.dictionary
+.dictionary-tag-option-count {
+    flex: 0 0 auto;
+
+    min-width: 1.5rem;
+
+    color:
+        var(--sl-color-gray-3);
+
+    font-size: 0.72rem;
+
+    text-align: right;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/* ---------------------------------------------------------
+   Selected tag chips
+   --------------------------------------------------------- */
+
+.dictionary
+.dictionary-selected-tags {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 0.4rem;
+
+    margin-top: 0.6rem;
+}
+
+
+.dictionary
+.dictionary-selected-tags[hidden] {
+    display: none !important;
+}
+
+
+.dictionary
+.dictionary-selected-tag {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 0.35rem;
+
+    box-sizing: border-box;
+
+    height: 1.95rem;
+
+    padding:
+        0
+        0.42rem
+        0
+        0.65rem;
+
+    border:
+        1px solid
+        var(--sl-color-accent);
+
+    border-radius: 999px;
+
+    background:
+        var(--sl-color-accent-low);
+
+    color:
+        var(--sl-color-accent-high);
+
+    font-size: 0.76rem;
+    line-height: 1;
+}
+
+
+.dictionary
+button.dictionary-selected-tag-remove {
+    appearance: none;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    width: 1.15rem;
+    height: 1.15rem;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background:
+        transparent;
+
+    color:
+        var(--sl-color-gray-3);
+
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+
+.dictionary
+button.dictionary-selected-tag-remove:hover {
+    background:
+        var(--sl-color-accent);
+
+    color:
+        var(--sl-color-black);
+}
+
+
+/* ---------------------------------------------------------
+   Tags displayed inside entry cards
+   --------------------------------------------------------- */
+
+.dictionary .tags {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 0.4rem;
+
+    margin: 0 !important;
+}
+
+
+.dictionary
+button.entry-tag-button {
+    appearance: none;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    min-width: 4rem;
+    height: 1.9rem;
+
+    margin: 0 !important;
+    padding:
+        0
+        0.62rem;
+
+    border:
+        1px solid
+        var(--sl-color-hairline);
+
+    border-radius: 999px;
+
+    background:
+        transparent;
+
+    color:
+        var(--sl-color-gray-2);
+
+    font: inherit;
+    font-size: 0.74rem;
+    line-height: 1;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        border-color 150ms ease,
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+
+.dictionary
+button.entry-tag-button:hover {
+    border-color:
+        var(--sl-color-accent);
+
+    background:
+        var(--sl-color-accent-low);
+
+    color:
+        var(--sl-color-accent-high);
+}
+
+
+:root[data-theme='light']
+.dictionary
+button.entry-tag-button {
+    background:
+        rgba(238, 245, 248, 0.7);
+}
+
+
+:root[data-theme='dark']
+.dictionary
+button.entry-tag-button {
+    background:
+        rgba(39, 60, 71, 0.32);
+}

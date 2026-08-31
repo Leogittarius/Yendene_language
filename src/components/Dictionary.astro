@@ -4,6 +4,65 @@ import Gloss from '@components/Gloss.astro';
 
 const entries = dictionary.entries;
 
+
+
+/*
+ * Tags aggregation
+ *
+ * 统计整个词典中每个标签被多少个词条使用。
+ * 同一个词条即使意外重复写了同一个 tag，
+ * 这里也只计数一次。
+ */
+const tagCounts = new Map();
+
+entries.forEach((entry) => {
+
+    const uniqueTags =
+        new Set(
+            (entry.tags ?? [])
+                .map((tag) =>
+                    String(tag).trim()
+                )
+                .filter(Boolean)
+        );
+
+
+    uniqueTags.forEach((tag) => {
+
+        tagCounts.set(
+            tag,
+            (tagCounts.get(tag) ?? 0) + 1
+        );
+
+    });
+
+});
+
+
+/*
+ * 默认按照使用次数从高到低排列。
+ * 次数相同时按照中文名称排列。
+ *
+ * 因而标签搜索框为空时，
+ * 前 10 个自然就是最常用标签。
+ */
+const aggregatedTags =
+    Array.from(
+        tagCounts.entries()
+    )
+    .map(([tag, count]) => ({
+        tag,
+        count,
+    }))
+    .sort(
+        (a, b) =>
+            b.count - a.count ||
+            a.tag.localeCompare(
+                b.tag,
+                'zh-CN'
+            )
+    );
+
 function stripDiacritics(value) {
     return String(value)
         .normalize('NFD')
@@ -238,6 +297,73 @@ function getFormationLabel(type) {
             }
         </div>
 
+
+
+        <div class="dictionary-tag-filter">
+
+        <span class="dictionary-filter-label">
+            标签
+        </span>
+
+
+        <div class="dictionary-tag-picker">
+
+            <input
+                id="dictionary-tag-search"
+                class="dictionary-tag-search"
+                type="text"
+                autocomplete="off"
+                placeholder="搜索或选择标签……"
+            />
+
+
+            <div
+                id="dictionary-tag-options"
+                class="dictionary-tag-options"
+                hidden
+            >
+
+                {
+                    aggregatedTags.map(
+                        ({ tag, count }) => (
+
+                            <button
+                                type="button"
+                                class="dictionary-tag-option"
+                                data-tag-option
+                                data-tag={tag}
+                                data-tag-search={tag.toLowerCase()}
+                            >
+
+                                <span class="dictionary-tag-option-name">
+                                    {tag}
+                                </span>
+
+                                <span class="dictionary-tag-option-count">
+                                    {count}
+                                </span>
+
+                            </button>
+
+                        )
+                    )
+                }
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="dictionary-selected-tags"
+            class="dictionary-selected-tags"
+            hidden
+        ></div>
+
+    </div>
+
+
+
         <div class="dictionary-summary">
             当前显示
             <strong id="dictionary-visible-count">
@@ -265,6 +391,7 @@ function getFormationLabel(type) {
                     class="dictionary-entry"
                     id={entry.id}
                     data-dictionary-entry
+                    data-tags={JSON.stringify(entry.tags ?? [])}
                     data-search={getSearchText(entry)}
                     data-pos={entry.pos.join(' ')}
                 >
@@ -506,9 +633,14 @@ function getFormationLabel(type) {
                                 <div class="tags">
                                     {
                                         entry.tags.map((tag) => (
-                                            <span class="tag">
+                                            <button
+                                                type="button"
+                                                class="entry-tag-button"
+                                                data-entry-tag={tag}
+                                                title={`筛选标签：${tag}`}
+                                            >
                                                 {tag}
-                                            </span>
+                                            </button>
                                         ))
                                     }
                                 </div>
@@ -1247,12 +1379,21 @@ function getFormationLabel(type) {
 
 <script>
     function initialiseDictionarySearch() {
-        const dictionary = document.querySelector('.dictionary');
+
+        const dictionary =
+            document.querySelector('.dictionary');
 
         if (!dictionary) return;
 
+
+        /* =====================================
+           页面元素
+           ===================================== */
+
         const input =
-            dictionary.querySelector('#dictionary-search');
+            dictionary.querySelector(
+                '#dictionary-search'
+            );
 
         const entries =
             Array.from(
@@ -1276,7 +1417,32 @@ function getFormationLabel(type) {
             );
 
 
-        let activePos = 'all';
+        /* Tags */
+
+        const tagSearch =
+            dictionary.querySelector(
+                '#dictionary-tag-search'
+            );
+
+        const tagOptionsBox =
+            dictionary.querySelector(
+                '#dictionary-tag-options'
+            );
+
+        const tagOptions =
+            Array.from(
+                dictionary.querySelectorAll(
+                    '[data-tag-option]'
+                )
+            );
+
+        const selectedTagList =
+            dictionary.querySelector(
+                '#dictionary-selected-tags'
+            );
+
+
+        /* Summary */
 
         const count =
             dictionary.querySelector(
@@ -1288,175 +1454,860 @@ function getFormationLabel(type) {
                 '#dictionary-empty'
             );
 
-        if (!input || !count || !empty) return;
+
+        if (
+            !input ||
+            !count ||
+            !empty ||
+            !tagSearch ||
+            !tagOptionsBox ||
+            !selectedTagList
+        ) {
+            return;
+        }
+
+
+        /* =====================================
+           当前筛选状态
+           ===================================== */
+
+        let activePos =
+            'all';
+
+        const selectedTags =
+            new Set();
+
+
+        /* =====================================
+           通用标准化
+           ===================================== */
 
         const normalize = (value) =>
-            value
+            String(value)
                 .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ''
+                )
                 .toLowerCase()
                 .trim();
 
-        const update = () => {
-            const query = normalize(input.value);
 
-            const terms = query
-                .split(/\s+/)
-                .filter(Boolean);
+        /* =====================================
+           已选择 Tags
+           ===================================== */
 
-            let visible = 0;
+        function renderSelectedTags() {
 
-            entries.forEach((entry) => {
-                const searchText =
-                    entry.dataset.search ?? '';
+            selectedTagList.innerHTML =
+                '';
 
-                const matchesSearch =
-                    terms.length === 0 ||
-                    terms.every((term) =>
-                        searchText.includes(term)
+
+            if (
+                selectedTags.size === 0
+            ) {
+
+                selectedTagList.hidden =
+                    true;
+
+                return;
+
+            }
+
+
+            selectedTagList.hidden =
+                false;
+
+
+            selectedTags.forEach(
+                (tag) => {
+
+                    const chip =
+                        document.createElement(
+                            'span'
+                        );
+
+                    chip.className =
+                        'dictionary-selected-tag';
+
+
+                    const text =
+                        document.createElement(
+                            'span'
+                        );
+
+                    text.textContent =
+                        tag;
+
+
+                    const removeButton =
+                        document.createElement(
+                            'button'
+                        );
+
+                    removeButton.type =
+                        'button';
+
+                    removeButton.className =
+                        'dictionary-selected-tag-remove';
+
+                    removeButton.dataset.removeTag =
+                        tag;
+
+                    removeButton.textContent =
+                        '×';
+
+                    removeButton.setAttribute(
+                        'aria-label',
+                        `取消标签筛选 ${tag}`
                     );
 
-                const entryPos =
-                    (entry.dataset.pos ?? '')
-                        .split(/\s+/)
-                        .filter(Boolean);
 
-                const matchesPos =
-                    activePos === 'all' ||
-                    entryPos.includes(activePos);
+                    chip.append(
+                        text,
+                        removeButton
+                    );
 
-                const matches =
-                    matchesSearch && matchesPos;
 
-                entry.hidden = !matches;
+                    selectedTagList.appendChild(
+                        chip
+                    );
 
-                if (matches) {
-                    visible += 1;
                 }
-            });
+            );
+
+        }
+
+
+        /* =====================================
+           Tag 聚合菜单
+           ===================================== */
+
+        function updateTagOptions() {
+
+            const query =
+                normalize(
+                    tagSearch.value
+                );
+
+
+            let shown = 0;
+
+
+            tagOptions.forEach(
+                (option) => {
+
+                    const tag =
+                        option.dataset.tag ?? '';
+
+                    const searchText =
+                        normalize(
+                            option.dataset
+                                .tagSearch ?? tag
+                        );
+
+
+                    const alreadySelected =
+                        selectedTags.has(tag);
+
+
+                    let visible =
+                        false;
+
+
+                    /*
+                     * 输入框为空：
+                     * 显示最常用前 10 个。
+                     *
+                     * 有搜索内容：
+                     * 显示前 12 个匹配项。
+                     *
+                     * aggregatedTags 在 Astro
+                     * 部分已经按照使用次数排序，
+                     * 所以这里不需要重新排序。
+                     */
+                    if (!alreadySelected) {
+
+                        if (!query) {
+
+                            visible =
+                                shown < 10;
+
+                        }
+                        else {
+
+                            visible =
+                                searchText.includes(
+                                    query
+                                ) &&
+                                shown < 12;
+
+                        }
+
+                    }
+
+
+                    option.hidden =
+                        !visible;
+
+
+                    if (visible) {
+                        shown += 1;
+                    }
+
+                }
+            );
+
+
+            tagOptionsBox.hidden =
+                shown === 0;
+
+        }
+
+
+        /* =====================================
+           主筛选
+           ===================================== */
+
+        const update = () => {
+
+            /*
+             * 全文搜索
+             */
+
+            const query =
+                normalize(
+                    input.value
+                );
+
+            const terms =
+                query
+                    .split(/\s+/)
+                    .filter(Boolean);
+
+
+            let visible =
+                0;
+
+
+            entries.forEach(
+                (entry) => {
+
+                    /* ---------- 全文 ---------- */
+
+                    const searchText =
+                        entry.dataset.search ??
+                        '';
+
+                    const matchesSearch =
+                        terms.length === 0 ||
+                        terms.every(
+                            (term) =>
+                                searchText.includes(
+                                    term
+                                )
+                        );
+
+
+                    /* ---------- POS ---------- */
+
+                    const entryPos =
+                        (
+                            entry.dataset.pos ??
+                            ''
+                        )
+                            .split(/\s+/)
+                            .filter(Boolean);
+
+
+                    const matchesPos =
+                        activePos === 'all' ||
+                        entryPos.includes(
+                            activePos
+                        );
+
+
+                    /* ---------- Tags ---------- */
+
+                    let entryTags =
+                        [];
+
+
+                    try {
+
+                        const parsed =
+                            JSON.parse(
+                                entry.dataset.tags ??
+                                '[]'
+                            );
+
+
+                        if (
+                            Array.isArray(
+                                parsed
+                            )
+                        ) {
+
+                            entryTags =
+                                parsed;
+
+                        }
+
+                    }
+                    catch {
+
+                        entryTags =
+                            [];
+
+                    }
+
+
+                    /*
+                     * AND 逻辑：
+                     *
+                     * 每一个已选择的 tag
+                     * 都必须存在于词条里。
+                     */
+                    const matchesTags =
+                        Array.from(
+                            selectedTags
+                        )
+                        .every(
+                            (tag) =>
+                                entryTags.includes(
+                                    tag
+                                )
+                        );
+
+
+                    /* ---------- 最终 ---------- */
+
+                    const matches =
+                        matchesSearch &&
+                        matchesPos &&
+                        matchesTags;
+
+
+                    entry.hidden =
+                        !matches;
+
+
+                    if (matches) {
+                        visible += 1;
+                    }
+
+                }
+            );
+
 
             count.textContent =
                 String(visible);
 
+
             empty.hidden =
                 visible !== 0;
+
         };
 
-        input.addEventListener('input', update);
 
-        filters.forEach((filter) => {
-            filter.addEventListener('click', () => {
-                activePos =
-                    filter.dataset.posFilter ?? 'all';
+        /* =====================================
+           添加 Tag 筛选
+           ===================================== */
 
-                filters.forEach((button) => {
-                    const isActive =
-                        button === filter;
+        function addTagFilter(
+            tag,
+            keepMenuOpen = false
+        ) {
 
-                    button.classList.toggle(
-                        'is-active',
-                        isActive
+            if (!tag) {
+                return;
+            }
+
+
+            selectedTags.add(
+                tag
+            );
+
+
+            tagSearch.value =
+                '';
+
+
+            renderSelectedTags();
+
+
+            /*
+             * 从标签菜单选择时，
+             * 保持菜单打开，
+             * 方便连续选择多个标签。
+             *
+             * 从词条卡片点击 Tag 时，
+             * 则不需要弹出顶部菜单。
+             */
+            if (keepMenuOpen) {
+
+                updateTagOptions();
+
+            }
+            else {
+
+                tagOptionsBox.hidden =
+                    true;
+
+            }
+
+
+            update();
+
+        }
+
+
+        /* =====================================
+           删除 Tag 筛选
+           ===================================== */
+
+        function removeTagFilter(
+            tag
+        ) {
+
+            selectedTags.delete(
+                tag
+            );
+
+
+            renderSelectedTags();
+
+
+            /*
+            * 删除一个筛选标签后，
+            * 重新生成候选列表。
+            *
+            * 这样刚刚删除的标签会重新出现在
+            * 上方聚合候选中，同时菜单保持打开。
+            */
+            tagSearch.value =
+                '';
+
+            updateTagOptions();
+
+
+            update();
+
+        }
+
+
+        /* =====================================
+           清空 Tags
+           ===================================== */
+
+        function clearTagFilters() {
+
+            selectedTags.clear();
+
+
+            tagSearch.value =
+                '';
+
+
+            renderSelectedTags();
+
+
+            tagOptionsBox.hidden =
+                true;
+
+        }
+
+
+        /* =====================================
+           全文搜索
+           ===================================== */
+
+        input.addEventListener(
+            'input',
+            update
+        );
+
+
+        /* =====================================
+           POS 筛选
+           ===================================== */
+
+        filters.forEach(
+            (filter) => {
+
+                filter.addEventListener(
+                    'click',
+                    () => {
+
+                        activePos =
+                            filter.dataset
+                                .posFilter ??
+                            'all';
+
+
+                        filters.forEach(
+                            (button) => {
+
+                                const isActive =
+                                    button ===
+                                    filter;
+
+
+                                button.classList
+                                    .toggle(
+                                        'is-active',
+                                        isActive
+                                    );
+
+
+                                button.setAttribute(
+                                    'aria-pressed',
+                                    String(
+                                        isActive
+                                    )
+                                );
+
+                            }
+                        );
+
+
+                        update();
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =====================================
+           Tags 搜索框
+           ===================================== */
+
+        /*
+         * 点击输入框：
+         * 即使什么都没输入，
+         * 也展示最常用的前 10 个。
+         */
+        tagSearch.addEventListener(
+            'focus',
+            () => {
+
+                updateTagOptions();
+
+            }
+        );
+
+
+        /*
+         * 输入内容时实时筛选标签。
+         */
+        tagSearch.addEventListener(
+            'input',
+            () => {
+
+                updateTagOptions();
+
+            }
+        );
+
+
+        /* =====================================
+           点击 Tag 聚合候选
+           ===================================== */
+
+        tagOptions.forEach(
+            (option) => {
+
+                option.addEventListener(
+                    'click',
+                    () => {
+
+                        const tag =
+                            option.dataset.tag;
+
+
+                        if (!tag) {
+                            return;
+                        }
+
+
+                        /*
+                         * true：
+                         * 保持聚合菜单打开，
+                         * 方便继续选第二、第三个 tag。
+                         */
+                        addTagFilter(
+                            tag,
+                            false
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =====================================
+           删除顶部已选 Tag
+           ===================================== */
+
+        selectedTagList.addEventListener(
+            'click',
+            (event) => {
+
+                const button =
+                    event.target.closest(
+                        '[data-remove-tag]'
                     );
 
-                    button.setAttribute(
-                        'aria-pressed',
-                        String(isActive)
+
+                if (!button) {
+                    return;
+                }
+
+
+                const tag =
+                    button.dataset
+                        .removeTag;
+
+
+                if (tag) {
+
+                    removeTagFilter(
+                        tag
                     );
-                });
 
-                update();
-            });
-        });
+                }
 
-            relationLinks.forEach((link) => {
-
-                link.addEventListener('click', (event) => {
-
-                    const targetId =
-                        link.dataset.relationLink;
-
-                    if (!targetId) return;
-
-                    const target =
-                        document.getElementById(targetId);
-
-                    if (!target) return;
-
-                    event.preventDefault();
+            }
+        );
 
 
-                    /* 清空搜索 */
+        /* =====================================
+           点击词条卡片 Tag
+           ===================================== */
 
-                    input.value = '';
+        dictionary.addEventListener(
+            'click',
+            (event) => {
+
+                const button =
+                    event.target.closest(
+                        '[data-entry-tag]'
+                    );
 
 
-                    /* 重置词性筛选 */
+                if (!button) {
+                    return;
+                }
 
-                    activePos = 'all';
 
-                    filters.forEach((button) => {
+                const tag =
+                    button.dataset
+                        .entryTag;
 
-                        const isAll =
-                            button.dataset.posFilter === 'all';
 
-                        button.classList.toggle(
-                            'is-active',
-                            isAll
+                if (tag) {
+
+                    /*
+                     * false：
+                     * 从词条点击时，
+                     * 不弹出顶部聚合菜单。
+                     */
+                    addTagFilter(
+                        tag,
+                        false
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =====================================
+           点击外部关闭 Tags 菜单
+           ===================================== */
+
+        document.addEventListener(
+            'click',
+            (event) => {
+
+                if (
+                    event.target.closest(
+                        '.dictionary-tag-filter'
+                    )
+                ) {
+                    return;
+                }
+
+
+                tagOptionsBox.hidden =
+                    true;
+
+            }
+        );
+
+
+        /* =====================================
+           构词 / Relations 跳转
+           ===================================== */
+
+        relationLinks.forEach(
+            (link) => {
+
+                link.addEventListener(
+                    'click',
+                    (event) => {
+
+                        const targetId =
+                            link.dataset
+                                .relationLink;
+
+
+                        if (!targetId) {
+                            return;
+                        }
+
+
+                        const target =
+                            document
+                                .getElementById(
+                                    targetId
+                                );
+
+
+                        if (!target) {
+                            return;
+                        }
+
+
+                        event.preventDefault();
+
+
+                        /*
+                         * 清空全文搜索。
+                         */
+                        input.value =
+                            '';
+
+
+                        /*
+                         * 重置 POS。
+                         */
+                        activePos =
+                            'all';
+
+
+                        filters.forEach(
+                            (button) => {
+
+                                const isAll =
+                                    button.dataset
+                                        .posFilter ===
+                                    'all';
+
+
+                                button.classList
+                                    .toggle(
+                                        'is-active',
+                                        isAll
+                                    );
+
+
+                                button.setAttribute(
+                                    'aria-pressed',
+                                    String(
+                                        isAll
+                                    )
+                                );
+
+                            }
                         );
 
-                        button.setAttribute(
-                            'aria-pressed',
-                            String(isAll)
+
+                        /*
+                         * 同时清空 Tags。
+                         *
+                         * 否则目标词条可能因为
+                         * 当前标签过滤而仍然隐藏。
+                         */
+                        clearTagFilters();
+
+
+                        /*
+                         * 重新显示词条。
+                         */
+                        update();
+
+
+                        /*
+                         * 等待页面更新后跳转。
+                         */
+                        requestAnimationFrame(
+                            () => {
+
+                                target
+                                    .scrollIntoView({
+                                        behavior:
+                                            'smooth',
+
+                                        block:
+                                            'start',
+                                    });
+
+
+                                history
+                                    .replaceState(
+                                        null,
+                                        '',
+                                        `#${targetId}`
+                                    );
+
+
+                                /*
+                                 * 临时高亮目标。
+                                 */
+                                target.classList.add(
+                                    'relation-target'
+                                );
+
+
+                                window.setTimeout(
+                                    () => {
+
+                                        target
+                                            .classList
+                                            .remove(
+                                                'relation-target'
+                                            );
+
+                                    },
+                                    1200
+                                );
+
+                            }
                         );
 
-                    });
+                    }
+                );
+
+            }
+        );
 
 
-                    /* 重新显示词条 */
+        /* =====================================
+           Initial state
+           ===================================== */
 
-                    update();
-
-
-                    /* 等待页面更新后跳转 */
-
-                    requestAnimationFrame(() => {
-
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-
-                        history.replaceState(
-                            null,
-                            '',
-                            `#${targetId}`
-                        );
-
-
-                        /* 临时高亮目标词条 */
-
-                        target.classList.add(
-                            'relation-target'
-                        );
-
-                        window.setTimeout(() => {
-
-                            target.classList.remove(
-                                'relation-target'
-                            );
-
-                        }, 1200);
-
-                    });
-
-                });
-
-            });
-
-
+        renderSelectedTags();
 
         update();
+
     }
+
 
     initialiseDictionarySearch();
 </script>
