@@ -303,6 +303,196 @@ const lookupJson =
         </section>
 
 
+
+        <!-- =====================================
+            Variants
+            ===================================== -->
+
+        <section class="builder-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>异体形式</h2>
+
+                    <span class="field-help">
+                        可以添加不同拼写、方言形式、旧形式等异体。
+                    </span>
+                </div>
+
+                <button
+                    id="eb-add-variant"
+                    class="small-button"
+                    type="button"
+                >
+                    ＋ 添加异体
+                </button>
+
+            </div>
+
+            <div id="eb-variant-list"></div>
+
+        </section>
+
+
+
+         <!-- =====================================
+         Relations
+         ===================================== -->
+
+        <section
+            id="eb-relations"
+            class="builder-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>词汇关系</h2>
+
+                    <span class="field-help">
+                        搜索并选择已有词条。
+                        如果目标尚未收录，也可以暂时使用一个 ID。
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="relation-editor">
+
+
+                <!-- 相关词 -->
+
+                <div
+                    class="relation-group"
+                    data-relation-type="related"
+                >
+
+                    <span class="field-label">
+                        相关词
+                    </span>
+
+                    <div class="relation-chip-list"></div>
+
+                    <div class="relation-picker">
+
+                        <input
+                            type="text"
+                            class="relation-input"
+                            autocomplete="off"
+                            placeholder="搜索词形、ID 或释义……"
+                        />
+
+                        <div
+                            class="relation-suggestions"
+                            hidden
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 同义词 -->
+
+                <div
+                    class="relation-group"
+                    data-relation-type="synonyms"
+                >
+
+                    <span class="field-label">
+                        同义词
+                    </span>
+
+                    <div class="relation-chip-list"></div>
+
+                    <div class="relation-picker">
+
+                        <input
+                            type="text"
+                            class="relation-input"
+                            autocomplete="off"
+                            placeholder="搜索词形、ID 或释义……"
+                        />
+
+                        <div
+                            class="relation-suggestions"
+                            hidden
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 反义词 -->
+
+                <div
+                    class="relation-group"
+                    data-relation-type="antonyms"
+                >
+
+                    <span class="field-label">
+                        反义词
+                    </span>
+
+                    <div class="relation-chip-list"></div>
+
+                    <div class="relation-picker">
+
+                        <input
+                            type="text"
+                            class="relation-input"
+                            autocomplete="off"
+                            placeholder="搜索词形、ID 或释义……"
+                        />
+
+                        <div
+                            class="relation-suggestions"
+                            hidden
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 派生词 -->
+
+                <div
+                    class="relation-group"
+                    data-relation-type="derived"
+                >
+
+                    <span class="field-label">
+                        派生词
+                    </span>
+
+                    <div class="relation-chip-list"></div>
+
+                    <div class="relation-picker">
+
+                        <input
+                            type="text"
+                            class="relation-input"
+                            autocomplete="off"
+                            placeholder="搜索词形、ID 或释义……"
+                        />
+
+                        <div
+                            class="relation-suggestions"
+                            hidden
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
         <!-- =====================================
              Examples
              ===================================== -->
@@ -1063,6 +1253,7 @@ const lookupJson =
 
 
 
+
     /* ========================================
     Tags
     ======================================== */
@@ -1249,7 +1440,245 @@ const lookupJson =
     }
 
 
+    /* ========================================
+    Relations
+    ======================================== */
 
+    .entry-builder .relation-editor {
+        display: grid;
+        gap: 1rem;
+    }
+
+
+    .entry-builder .relation-group {
+        padding: 0.85rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        border-radius: 0.45rem;
+    }
+
+
+    .entry-builder .relation-chip-list {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 0.4rem;
+
+        margin:
+            0
+            0
+            0.55rem !important;
+
+        min-height: 0.2rem;
+    }
+
+
+    .entry-builder .relation-chip {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 0.35rem;
+
+        padding:
+            0.3rem
+            0.5rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 999px;
+
+        background:
+            var(--sl-color-accent-low);
+
+        color:
+            var(--sl-color-gray-1);
+
+        font-size: 0.78rem;
+    }
+
+
+    .entry-builder .relation-chip.pending {
+        border-style: dashed;
+
+        background: transparent;
+
+        color:
+            var(--sl-color-gray-2);
+    }
+
+
+    .entry-builder .relation-chip-id {
+        color:
+            var(--sl-color-gray-3);
+
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Consolas,
+            monospace;
+
+        font-size: 0.7rem;
+    }
+
+
+    .entry-builder .relation-chip-remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 1rem;
+        height: 1rem;
+
+        margin: 0 !important;
+        padding: 0;
+
+        border: 0;
+
+        background: transparent;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font: inherit;
+        line-height: 1;
+
+        cursor: pointer;
+    }
+
+
+    .entry-builder .relation-chip-remove:hover {
+        color:
+            var(--sl-color-white);
+    }
+
+
+    .entry-builder .relation-picker {
+        position: relative;
+    }
+
+
+    .entry-builder .relation-suggestions {
+        position: absolute;
+
+        z-index: 50;
+
+        top: calc(100% + 0.3rem);
+        left: 0;
+        right: 0;
+
+        max-height: 18rem;
+
+        overflow-y: auto;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.42rem;
+
+        background:
+            var(--sl-color-bg);
+
+        box-shadow:
+            0 0.5rem 1.5rem
+            rgba(0, 0, 0, 0.14);
+    }
+
+
+    .entry-builder .relation-suggestions[hidden] {
+        display: none !important;
+    }
+
+
+    .entry-builder .relation-suggestion {
+        display: block;
+
+        width: 100%;
+
+        margin: 0 !important;
+        padding:
+            0.55rem
+            0.65rem;
+
+        border: 0;
+
+        border-bottom:
+            1px solid
+            var(--sl-color-hairline-light);
+
+        background: transparent;
+
+        color:
+            var(--sl-color-gray-1);
+
+        text-align: left;
+
+        font: inherit;
+
+        cursor: pointer;
+    }
+
+
+    .entry-builder .relation-suggestion:last-child {
+        border-bottom: 0;
+    }
+
+
+    .entry-builder .relation-suggestion:hover {
+        background:
+            var(--sl-color-accent-low);
+    }
+
+
+    .entry-builder .relation-suggestion-head {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+
+        gap: 0.5rem;
+    }
+
+
+    .entry-builder .relation-suggestion-headword {
+        font-weight: 650;
+    }
+
+
+    .entry-builder .relation-suggestion-id {
+        color:
+            var(--sl-color-gray-3);
+
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Consolas,
+            monospace;
+
+        font-size: 0.72rem;
+    }
+
+
+    .entry-builder .relation-suggestion-definition {
+        display: block;
+
+        margin-top: 0.15rem;
+
+        color:
+            var(--sl-color-gray-3);
+
+        font-size: 0.74rem;
+    }
+
+
+    .entry-builder .relation-pending-option {
+        color:
+            var(--sl-color-accent-high);
+    }
 
 </style>
 
@@ -1799,6 +2228,22 @@ const lookupJson =
 
         const notes =
             root.querySelector('#eb-notes');
+
+
+        const variantList =
+            root.querySelector(
+                '#eb-variant-list'
+            );
+
+        const addVariantButton =
+            root.querySelector(
+                '#eb-add-variant'
+            );
+
+        const relationSection =
+        root.querySelector(
+            '#eb-relations'
+        );
 
         const exampleList =
             root.querySelector(
@@ -4690,6 +5135,864 @@ const lookupJson =
 
         }
 
+        /* =====================================
+           Variants
+           ===================================== */
+
+
+        /*
+         * 重新编号：
+         *
+         * 异体 1
+         * 异体 2
+         * 异体 3
+         * ...
+         */
+        function refreshVariantNumbers() {
+
+            const items =
+                Array.from(
+                    variantList.querySelectorAll(
+                        '.variant-item'
+                    )
+                );
+
+
+            items.forEach(
+                (item, index) => {
+
+                    item.querySelector(
+                        '.variant-title'
+                    ).textContent =
+                        `异体 ${index + 1}`;
+
+                }
+            );
+
+        }
+
+
+        /*
+         * 添加一个新的异体。
+         *
+         * form：
+         * 实际异体形式。
+         *
+         * label：
+         * 对这个异体的说明。
+         */
+        function addVariant(
+            form = '',
+            label = ''
+        ) {
+
+            const item =
+                document.createElement(
+                    'div'
+                );
+
+
+            item.className =
+                'dynamic-item variant-item';
+
+
+            item.innerHTML = `
+
+                <div class="dynamic-item-header">
+
+                    <span
+                        class="
+                            dynamic-item-title
+                            variant-title
+                        "
+                    >
+                        异体
+                    </span>
+
+
+                    <button
+                        type="button"
+                        class="
+                            delete-button
+                            delete-variant
+                        "
+                    >
+                        删除
+                    </button>
+
+                </div>
+
+
+                <div class="sense-fields">
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            形式
+                        </span>
+
+                        <input
+                            type="text"
+                            class="variant-form"
+                            placeholder="例如：nue"
+                        />
+
+                    </label>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            说明
+                        </span>
+
+                        <input
+                            type="text"
+                            class="variant-label"
+                            placeholder="例如：方言、不同的词典拼写"
+                        />
+
+                    </label>
+
+                </div>
+
+            `;
+
+
+            item.querySelector(
+                '.variant-form'
+            ).value =
+                form;
+
+
+            item.querySelector(
+                '.variant-label'
+            ).value =
+                label;
+
+
+            variantList.appendChild(
+                item
+            );
+
+
+            refreshVariantNumbers();
+
+            update();
+
+        }
+
+
+        /*
+         * 把页面上的所有异体整理成
+         * dictionary.json 所需的数据。
+         *
+         * 完全空白的一行会被忽略。
+         */
+        function getVariants() {
+
+            return Array.from(
+                variantList.querySelectorAll(
+                    '.variant-item'
+                )
+            )
+
+            .map(
+                (item) => {
+
+                    const form =
+                        item.querySelector(
+                            '.variant-form'
+                        ).value.trim();
+
+
+                    const label =
+                        item.querySelector(
+                            '.variant-label'
+                        ).value.trim();
+
+
+                    /*
+                     * 两个框全部为空：
+                     * 不生成这一条。
+                     */
+                    if (
+                        !form &&
+                        !label
+                    ) {
+
+                        return null;
+
+                    }
+
+
+                    return {
+
+                        form,
+                        label,
+
+                    };
+
+                }
+            )
+
+            .filter(Boolean);
+
+        }
+
+
+        /*
+         * ＋ 添加异体
+         */
+        addVariantButton.addEventListener(
+            'click',
+            () => {
+
+                addVariant();
+
+            }
+        );
+
+
+        /*
+         * 删除异体。
+         */
+        variantList.addEventListener(
+            'click',
+            (event) => {
+
+                const deleteButton =
+                    event.target.closest(
+                        '.delete-variant'
+                    );
+
+
+                if (!deleteButton) {
+                    return;
+                }
+
+
+                const item =
+                    deleteButton.closest(
+                        '.variant-item'
+                    );
+
+
+                item?.remove();
+
+
+                refreshVariantNumbers();
+
+                update();
+
+            }
+        );
+
+
+
+
+        /* =====================================
+           Relations
+           ===================================== */
+
+
+        /*
+         * 得到某个关系组当前已经选择的所有 ID。
+         *
+         * 例如：
+         *
+         * synonyms
+         * → ["cumlolle", "xxx"]
+         */
+        function getRelationGroupRefs(
+            group
+        ) {
+
+            return Array.from(
+                group.querySelectorAll(
+                    '.relation-chip'
+                )
+            )
+            .map(
+                (chip) =>
+                    chip.dataset.ref
+            )
+            .filter(Boolean);
+
+        }
+
+
+        /*
+         * 某个关系组里是否已经存在这个 ID。
+         */
+        function relationHasRef(
+            group,
+            ref
+        ) {
+
+            return getRelationGroupRefs(
+                group
+            ).includes(ref);
+
+        }
+
+
+        /*
+         * 加入一个关系 chip。
+         *
+         * ref：
+         * 真正写入 dictionary.json 的 ID。
+         *
+         * label：
+         * 页面上给用户看的词形。
+         *
+         * pending：
+         * 目标词条是否尚未收录。
+         */
+        function addRelationRef(
+            group,
+            ref,
+            label,
+            pending = false
+        ) {
+
+            const cleanRef =
+                String(ref).trim();
+
+
+            if (!cleanRef) {
+                return;
+            }
+
+
+            /*
+             * 同一个关系组里不重复加入相同 ID。
+             */
+            if (
+                relationHasRef(
+                    group,
+                    cleanRef
+                )
+            ) {
+
+                const input =
+                    group.querySelector(
+                        '.relation-input'
+                    );
+
+                input.value = '';
+
+                group.querySelector(
+                    '.relation-suggestions'
+                ).hidden = true;
+
+                return;
+
+            }
+
+
+            const chip =
+                document.createElement(
+                    'span'
+                );
+
+
+            chip.className =
+                pending
+                    ? 'relation-chip pending'
+                    : 'relation-chip';
+
+
+            chip.dataset.ref =
+                cleanRef;
+
+
+            const text =
+                document.createElement(
+                    'span'
+                );
+
+            text.textContent =
+                label || cleanRef;
+
+
+            const id =
+                document.createElement(
+                    'span'
+                );
+
+            id.className =
+                'relation-chip-id';
+
+            id.textContent =
+                cleanRef;
+
+
+            const removeButton =
+                document.createElement(
+                    'button'
+                );
+
+            removeButton.type =
+                'button';
+
+            removeButton.className =
+                'relation-chip-remove';
+
+            removeButton.textContent =
+                '×';
+
+            removeButton.setAttribute(
+                'aria-label',
+                `删除关系 ${cleanRef}`
+            );
+
+
+            chip.append(
+                text,
+                id,
+                removeButton
+            );
+
+
+            group.querySelector(
+                '.relation-chip-list'
+            ).appendChild(
+                chip
+            );
+
+
+            const input =
+                group.querySelector(
+                    '.relation-input'
+                );
+
+            input.value = '';
+
+
+            group.querySelector(
+                '.relation-suggestions'
+            ).hidden = true;
+
+
+            update();
+
+        }
+
+
+        /*
+         * 渲染某个关系搜索框的搜索结果。
+         */
+        function renderRelationSuggestions(
+            group
+        ) {
+
+            const input =
+                group.querySelector(
+                    '.relation-input'
+                );
+
+            const resultBox =
+                group.querySelector(
+                    '.relation-suggestions'
+                );
+
+
+            const rawQuery =
+                input.value.trim();
+
+
+            const query =
+                normalizeSearch(
+                    rawQuery
+                );
+
+
+            resultBox.innerHTML =
+                '';
+
+
+            if (!query) {
+
+                resultBox.hidden =
+                    true;
+
+                return;
+
+            }
+
+
+            /*
+             * 从已有词典中搜索。
+             *
+             * 搜：
+             * ID
+             * headword
+             * definition
+             * gloss
+             * variants
+             */
+            const matches =
+                existingEntries
+
+                    .filter(
+                        (entry) =>
+                            getEntrySearchText(
+                                entry
+                            ).includes(query)
+                    )
+
+                    .filter(
+                        (entry) =>
+                            !relationHasRef(
+                                group,
+                                entry.id
+                            )
+                    )
+
+                    .slice(0, 8);
+
+
+            matches.forEach(
+                (entry) => {
+
+                    const button =
+                        document.createElement(
+                            'button'
+                        );
+
+
+                    button.type =
+                        'button';
+
+                    button.className =
+                        'relation-suggestion';
+
+
+                    const head =
+                        document.createElement(
+                            'span'
+                        );
+
+                    head.className =
+                        'relation-suggestion-head';
+
+
+                    const headword =
+                        document.createElement(
+                            'span'
+                        );
+
+                    headword.className =
+                        'relation-suggestion-headword';
+
+                    headword.textContent =
+                        entry.headword;
+
+
+                    const id =
+                        document.createElement(
+                            'span'
+                        );
+
+                    id.className =
+                        'relation-suggestion-id';
+
+                    id.textContent =
+                        `ID: ${entry.id}`;
+
+
+                    head.append(
+                        headword,
+                        id
+                    );
+
+
+                    button.appendChild(
+                        head
+                    );
+
+
+                    if (
+                        entry.definitions?.[0]
+                    ) {
+
+                        const definition =
+                            document.createElement(
+                                'span'
+                            );
+
+                        definition.className =
+                            'relation-suggestion-definition';
+
+                        definition.textContent =
+                            entry.definitions[0];
+
+
+                        button.appendChild(
+                            definition
+                        );
+
+                    }
+
+
+                    button.addEventListener(
+                        'click',
+                        () => {
+
+                            addRelationRef(
+                                group,
+                                entry.id,
+                                entry.headword,
+                                false
+                            );
+
+                        }
+                    );
+
+
+                    resultBox.appendChild(
+                        button
+                    );
+
+                }
+            );
+
+
+            /*
+             * 如果用户输入的内容可以生成一个合法 ID，
+             * 并且这个 ID 目前并不存在，
+             * 就允许建立 unresolved relation。
+             *
+             * 例如输入：
+             *
+             * talge
+             *
+             * →
+             *
+             * 使用 "talge" 作为暂未收录 ID
+             */
+            const pendingId =
+                makeId(
+                    rawQuery
+                );
+
+
+            if (
+                pendingId &&
+                !existingIds.has(
+                    pendingId
+                ) &&
+                !relationHasRef(
+                    group,
+                    pendingId
+                )
+            ) {
+
+                const pendingButton =
+                    document.createElement(
+                        'button'
+                    );
+
+
+                pendingButton.type =
+                    'button';
+
+                pendingButton.className =
+                    'relation-suggestion relation-pending-option';
+
+
+                pendingButton.textContent =
+                    `＋ 使用 "${pendingId}" ` +
+                    `作为暂未收录的 ID`;
+
+
+                pendingButton.addEventListener(
+                    'click',
+                    () => {
+
+                        addRelationRef(
+                            group,
+                            pendingId,
+                            rawQuery,
+                            true
+                        );
+
+                    }
+                );
+
+
+                resultBox.appendChild(
+                    pendingButton
+                );
+
+            }
+
+
+            resultBox.hidden =
+                resultBox.children.length ===
+                0;
+
+        }
+
+
+        /*
+         * 整理四种 relations，
+         * 生成 dictionary.json 所需结构。
+         */
+        function getRelations() {
+
+            const result = {
+
+                related: [],
+                synonyms: [],
+                antonyms: [],
+                derived: [],
+
+            };
+
+
+            relationSection
+                .querySelectorAll(
+                    '.relation-group'
+                )
+                .forEach(
+                    (group) => {
+
+                        const type =
+                            group.dataset
+                                .relationType;
+
+
+                        if (
+                            !Object.prototype
+                                .hasOwnProperty.call(
+                                    result,
+                                    type
+                                )
+                        ) {
+                            return;
+                        }
+
+
+                        result[type] =
+                            getRelationGroupRefs(
+                                group
+                            );
+
+                    }
+                );
+
+
+            return result;
+
+        }
+
+
+        /*
+         * 输入时实时搜索。
+         */
+        relationSection.addEventListener(
+            'input',
+            (event) => {
+
+                const input =
+                    event.target.closest(
+                        '.relation-input'
+                    );
+
+
+                if (!input) {
+                    return;
+                }
+
+
+                const group =
+                    input.closest(
+                        '.relation-group'
+                    );
+
+
+                renderRelationSuggestions(
+                    group
+                );
+
+            }
+        );
+
+
+        /*
+         * 删除已经选择的关系。
+         */
+        relationSection.addEventListener(
+            'click',
+            (event) => {
+
+                const removeButton =
+                    event.target.closest(
+                        '.relation-chip-remove'
+                    );
+
+
+                if (!removeButton) {
+                    return;
+                }
+
+
+                const chip =
+                    removeButton.closest(
+                        '.relation-chip'
+                    );
+
+
+                chip?.remove();
+
+
+                update();
+
+            }
+        );
+
+
+        /*
+         * 点击 Relations 以外区域时，
+         * 关闭所有搜索结果。
+         */
+        document.addEventListener(
+            'click',
+            (event) => {
+
+                if (
+                    event.target.closest(
+                        '.relation-picker'
+                    )
+                ) {
+                    return;
+                }
+
+
+                relationSection
+                    .querySelectorAll(
+                        '.relation-suggestions'
+                    )
+                    .forEach(
+                        (box) => {
+
+                            box.hidden =
+                                true;
+
+                        }
+                    );
+
+            }
+        );
+
+
+
+
+
+
+
 
 
 
@@ -5349,14 +6652,9 @@ const lookupJson =
                 etymology:
                     etymology.value.trim(),
 
-                variants: [],
+                variants: getVariants(),
 
-                relations: {
-                    related: [],
-                    synonyms: [],
-                    antonyms: [],
-                    derived: []
-                },
+                relations:  getRelations(),
 
                 examples: getExamples(),
 
@@ -5467,6 +6765,53 @@ const lookupJson =
 
                     }
                 );
+            
+
+            /*
+             * Relations
+             */
+            Object.entries(
+                entry.relations
+            ).forEach(
+                ([type, refs]) => {
+
+                    const uniqueRefs =
+                        new Set(refs);
+
+
+                    if (
+                        uniqueRefs.size !==
+                        refs.length
+                    ) {
+
+                        errors.push(
+                            `关系 ${type} 中存在重复 ID。`
+                        );
+
+                    }
+
+                }
+            );
+
+
+             /*
+             * Variants
+             */
+            entry.variants.forEach(
+                (variant, index) => {
+
+                    if (!variant.form) {
+
+                        errors.push(
+                            `异体 ${index + 1} ` +
+                            `缺少形式。`
+                        );
+
+                    }
+
+                }
+            );
+
 
              /*
              * Examples

@@ -914,6 +914,47 @@
     "职业"
   ],
   "notes": ""
+},
+{
+  "id": "tecapes",
+  "headword": "tecapes",
+  "type": "word",
+  "pos": [
+    "noun"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "火，火焰",
+      "gloss": "火"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [
+    {
+      "form": "huases",
+      "label": "方言"
+    }
+  ],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [
+    "自然世界"
+  ],
+  "notes": ""
 }
     
   ]
