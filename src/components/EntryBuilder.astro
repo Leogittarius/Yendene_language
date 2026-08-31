@@ -1,0 +1,1083 @@
+<div class="entry-builder">
+
+    <div class="builder-form">
+
+        <section class="builder-section">
+            <h2>基本信息</h2>
+
+            <label class="field">
+                <span class="field-label">词头</span>
+
+                <input
+                    id="eb-headword"
+                    type="text"
+                    placeholder="例如：nu(-e)"
+                />
+            </label>
+
+
+            <div class="field">
+                <span class="field-label">ID</span>
+
+                <div class="id-row">
+                    <input
+                        id="eb-id"
+                        type="text"
+                        placeholder="自动生成"
+                    />
+
+                    <button
+                        id="eb-regenerate-id"
+                        class="small-button"
+                        type="button"
+                    >
+                        重新生成
+                    </button>
+                </div>
+
+                <span class="field-help">
+                    根据词头自动建议，可手动修改。
+                </span>
+            </div>
+
+
+            <label class="field">
+                <span class="field-label">条目类型</span>
+
+                <select id="eb-type">
+                    <option value="word">word — 词</option>
+                    <option value="affix">affix — 词缀</option>
+                    <option value="root">root — 词根</option>
+                    <option value="clitic">clitic — 附着词</option>
+                    <option value="phrase">phrase — 短语</option>
+                </select>
+            </label>
+
+
+            <div class="field">
+                <span class="field-label">词性</span>
+
+                <div class="checkbox-grid">
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="noun"
+                        />
+                        <span>n. 普通名词</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="verb"
+                        />
+                        <span>v. 普通动态动词</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="stative"
+                        />
+                        <span>stat. 状态动词</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="numeral"
+                        />
+                        <span>num. 数量状态动词</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="pronoun"
+                        />
+                        <span>pron. 代词</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="function"
+                        />
+                        <span>func. 普通功能词</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="lightverb"
+                        />
+                        <span>lv. 轻动词</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="particle"
+                        />
+                        <span>part. 构式粒子</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="affix"
+                        />
+                        <span>aff. 普通派生词缀</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="pos"
+                            value="converb"
+                        />
+                        <span>conv. 副动词后缀</span>
+                    </label>
+
+                </div>
+            </div>
+
+
+            <label class="field">
+                <span class="field-label">状态</span>
+
+                <select id="eb-status">
+                    <option value="established">
+                        established — 已确定
+                    </option>
+
+                    <option value="draft">
+                        draft — 草案
+                    </option>
+
+                    <option value="deprecated">
+                        deprecated — 已废弃
+                    </option>
+                </select>
+            </label>
+
+        </section>
+
+
+        <section class="builder-section">
+            <h2>释义</h2>
+
+            <label class="field">
+                <span class="field-label">释义</span>
+
+                <textarea
+                    id="eb-definition"
+                    rows="3"
+                    placeholder="例如：狗，犬"
+                ></textarea>
+            </label>
+
+            <label class="field">
+                <span class="field-label">Gloss</span>
+
+                <input
+                    id="eb-gloss"
+                    type="text"
+                    placeholder="例如：狗"
+                />
+
+                <span class="field-help">
+                    用于逐词分析，可暂时留空。
+                </span>
+            </label>
+        </section>
+
+
+        <section class="builder-section">
+            <h2>构词</h2>
+
+            <label class="field">
+                <span class="field-label">构词类型</span>
+
+                <select id="eb-formation-type">
+                    <option value="simple">
+                        simple — 单纯形式
+                    </option>
+
+                    <option value="root">
+                        root — 词根
+                    </option>
+
+                    <option value="derived">
+                        derived — 派生
+                    </option>
+
+                    <option value="compound">
+                        compound — 复合
+                    </option>
+
+                    <option value="reduplicated">
+                        reduplicated — 重叠
+                    </option>
+
+                    <option value="ideophonic">
+                        ideophonic — 拟声 / 表意
+                    </option>
+
+                    <option value="opaque">
+                        opaque — 构词不透明
+                    </option>
+
+                    <option value="borrowed">
+                        borrowed — 借词
+                    </option>
+                </select>
+            </label>
+
+
+            <label class="field">
+                <span class="field-label">构词分析</span>
+
+                <input
+                    id="eb-analysis"
+                    type="text"
+                    placeholder="例如：ma-talge"
+                />
+
+                <span class="field-help">
+                    这里只填写显示用的 analysis。
+                    components 下一版加入。
+                </span>
+            </label>
+        </section>
+
+
+        <section class="builder-section">
+            <h2>其他</h2>
+
+            <label class="field">
+                <span class="field-label">IPA</span>
+
+                <input
+                    id="eb-ipa"
+                    type="text"
+                    placeholder="可留空"
+                />
+            </label>
+
+            <label class="field">
+                <span class="field-label">词源</span>
+
+                <textarea
+                    id="eb-etymology"
+                    rows="2"
+                    placeholder="可留空"
+                ></textarea>
+            </label>
+
+            <label class="field">
+                <span class="field-label">备注</span>
+
+                <textarea
+                    id="eb-notes"
+                    rows="2"
+                    placeholder="可留空"
+                ></textarea>
+            </label>
+        </section>
+
+    </div>
+
+
+    <aside class="builder-output">
+
+        <div class="output-header">
+
+            <div>
+                <h2>生成结果</h2>
+
+                <p>
+                    生成的是单个词条对象，
+                    可以直接复制到 entries 数组中。
+                </p>
+            </div>
+
+            <button
+                id="eb-copy"
+                class="copy-button"
+                type="button"
+                disabled
+            >
+                复制 JSON
+            </button>
+
+        </div>
+
+
+        <div
+            id="eb-validation"
+            class="validation"
+        ></div>
+
+
+        <textarea
+            id="eb-output"
+            class="json-output"
+            readonly
+            spellcheck="false"
+        ></textarea>
+
+    </aside>
+
+</div>
+
+
+<style>
+
+    .entry-builder {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(22rem, 0.9fr);
+
+        gap: 1.4rem;
+
+        margin-top: 1.5rem;
+    }
+
+
+    /* ========================================
+       Sections
+       ======================================== */
+
+    .builder-form {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .builder-section {
+        padding: 1.2rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.55rem;
+
+        margin: 0 !important;
+    }
+
+    :root[data-theme='light']
+    .builder-section {
+        background: #f8fbfc;
+        border-color: #d6e2e8;
+    }
+
+    :root[data-theme='dark']
+    .builder-section {
+        background: #101f27;
+        border-color: #273c47;
+    }
+
+    .builder-section h2,
+    .builder-output h2 {
+        margin: 0 0 1rem !important;
+
+        font-size: 1.05rem;
+        letter-spacing: -0.01em;
+    }
+
+
+    /* ========================================
+       Fields
+       ======================================== */
+
+    .field {
+        display: block;
+
+        margin:
+            0
+            0
+            1rem !important;
+    }
+
+    .field:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    .field-label {
+        display: block;
+
+        margin-bottom: 0.4rem;
+
+        color: var(--sl-color-gray-1);
+
+        font-size: 0.84rem;
+        font-weight: 650;
+    }
+
+    .field-help {
+        display: block;
+
+        margin-top: 0.35rem;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.76rem;
+    }
+
+
+    input[type='text'],
+    textarea,
+    select {
+        display: block;
+
+        box-sizing: border-box;
+
+        width: 100%;
+
+        margin: 0 !important;
+        padding: 0.62rem 0.72rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.42rem;
+
+        background: var(--sl-color-bg);
+
+        color: var(--sl-color-white);
+
+        font: inherit;
+        font-size: 0.9rem;
+
+        outline: none;
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    input[type='text']:focus,
+    textarea:focus,
+    select:focus {
+        border-color:
+            var(--sl-color-accent);
+    }
+
+
+    /* ========================================
+       ID
+       ======================================== */
+
+    .id-row {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+
+        gap: 0.5rem;
+    }
+
+
+    /* ========================================
+       POS
+       ======================================== */
+
+    .checkbox-grid {
+        display: grid;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 0.4rem;
+    }
+
+    .checkbox-grid label {
+        display: flex;
+        align-items: center;
+
+        gap: 0.45rem;
+
+        margin: 0 !important;
+        padding: 0.45rem 0.55rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.38rem;
+
+        color: var(--sl-color-gray-2);
+
+        font-size: 0.78rem;
+    }
+
+    .checkbox-grid input {
+        margin: 0 !important;
+    }
+
+
+    /* ========================================
+       Buttons
+       ======================================== */
+
+    .small-button,
+    .copy-button {
+        margin: 0 !important;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.42rem;
+
+        background: transparent;
+
+        color: var(--sl-color-gray-1);
+
+        font: inherit;
+
+        cursor: pointer;
+    }
+
+    .small-button {
+        padding: 0 0.7rem;
+
+        font-size: 0.78rem;
+    }
+
+    .copy-button {
+        padding:
+            0.5rem
+            0.8rem;
+
+        font-size: 0.82rem;
+    }
+
+    .small-button:hover,
+    .copy-button:not(:disabled):hover {
+        border-color:
+            var(--sl-color-accent);
+
+        background:
+            var(--sl-color-accent-low);
+    }
+
+    .copy-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+
+    /* ========================================
+       Output
+       ======================================== */
+
+    .builder-output {
+        align-self: start;
+
+        position: sticky;
+        top: 5rem;
+
+        padding: 1.2rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius: 0.55rem;
+
+        margin: 0 !important;
+    }
+
+    :root[data-theme='light']
+    .builder-output {
+        background: #f8fbfc;
+        border-color: #d6e2e8;
+    }
+
+    :root[data-theme='dark']
+    .builder-output {
+        background: #101f27;
+        border-color: #273c47;
+    }
+
+    .output-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        gap: 1rem;
+
+        margin-bottom: 0.8rem;
+    }
+
+    .output-header h2 {
+        margin-bottom: 0.25rem !important;
+    }
+
+    .output-header p {
+        margin: 0 !important;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.76rem;
+    }
+
+    .validation {
+        min-height: 1.2rem;
+
+        margin:
+            0
+            0
+            0.65rem !important;
+
+        color: var(--sl-color-gray-3);
+
+        font-size: 0.78rem;
+    }
+
+    .validation.error {
+        color: #c66;
+    }
+
+    .validation.valid {
+        color: var(--sl-color-accent-high);
+    }
+
+    .json-output {
+        min-height: 36rem;
+
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Consolas,
+            monospace;
+
+        font-size: 0.8rem;
+        line-height: 1.55;
+    }
+
+
+    /* ========================================
+       Mobile
+       ======================================== */
+
+    @media (max-width: 55rem) {
+
+        .entry-builder {
+            grid-template-columns: 1fr;
+        }
+
+        .builder-output {
+            position: static;
+        }
+
+    }
+
+    @media (max-width: 35rem) {
+
+        .checkbox-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+<script>
+
+    function initialiseEntryBuilder() {
+
+        const root =
+            document.querySelector('.entry-builder');
+
+        if (!root) return;
+
+
+        const headword =
+            root.querySelector('#eb-headword');
+
+        const idInput =
+            root.querySelector('#eb-id');
+
+        const regenerateId =
+            root.querySelector('#eb-regenerate-id');
+
+        const type =
+            root.querySelector('#eb-type');
+
+        const status =
+            root.querySelector('#eb-status');
+
+        const definition =
+            root.querySelector('#eb-definition');
+
+        const gloss =
+            root.querySelector('#eb-gloss');
+
+        const formationType =
+            root.querySelector(
+                '#eb-formation-type'
+            );
+
+        const analysis =
+            root.querySelector('#eb-analysis');
+
+        const ipa =
+            root.querySelector('#eb-ipa');
+
+        const etymology =
+            root.querySelector('#eb-etymology');
+
+        const notes =
+            root.querySelector('#eb-notes');
+
+        const output =
+            root.querySelector('#eb-output');
+
+        const validation =
+            root.querySelector('#eb-validation');
+
+        const copyButton =
+            root.querySelector('#eb-copy');
+
+
+        let idEditedManually = false;
+
+
+        function makeId(value) {
+
+            return value
+
+                /* 删除括号及括号中的内容 */
+                .replace(/\([^)]*\)/g, '')
+
+                /* 拆分附加符号 */
+                .normalize('NFD')
+
+                /* 删除音调 / 长音等组合符号 */
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ''
+                )
+
+                .toLowerCase()
+
+                .trim()
+
+                /* 空白变短杠 */
+                .replace(/\s+/g, '-')
+
+                /* 删除不允许的字符 */
+                .replace(/[^a-z0-9-]/g, '')
+
+                /* 多个短杠合一 */
+                .replace(/-{2,}/g, '-');
+        }
+
+
+        function getSelectedPos() {
+
+            return Array.from(
+                root.querySelectorAll(
+                    'input[name="pos"]:checked'
+                )
+            ).map(
+                (checkbox) =>
+                    checkbox.value
+            );
+
+        }
+
+
+        function buildEntry() {
+
+            const selectedPos =
+                getSelectedPos();
+
+            const sense = {
+                definition:
+                    definition.value.trim(),
+
+                gloss:
+                    gloss.value.trim()
+            };
+
+
+            return {
+                id:
+                    idInput.value.trim(),
+
+                headword:
+                    headword.value.trim(),
+
+                type:
+                    type.value,
+
+                pos:
+                    selectedPos,
+
+                pronunciation: {
+                    ipa:
+                        ipa.value.trim()
+                },
+
+                senses: [
+                    sense
+                ],
+
+                formation: {
+                    type:
+                        formationType.value,
+
+                    analysis:
+                        analysis.value.trim(),
+
+                    components: []
+                },
+
+                etymology:
+                    etymology.value.trim(),
+
+                variants: [],
+
+                relations: {
+                    related: [],
+                    synonyms: [],
+                    antonyms: [],
+                    derived: []
+                },
+
+                examples: [],
+
+                status:
+                    status.value,
+
+                tags: [],
+
+                notes:
+                    notes.value.trim()
+            };
+
+        }
+
+
+        function validateEntry(entry) {
+
+            const errors = [];
+
+
+            if (!entry.headword) {
+                errors.push('请填写词头。');
+            }
+
+            if (!entry.id) {
+                errors.push('ID 不能为空。');
+            }
+
+            if (
+                entry.id &&
+                !/^[a-z0-9-]+$/.test(entry.id)
+            ) {
+                errors.push(
+                    'ID 只能包含小写 ASCII 字母、数字和短杠。'
+                );
+            }
+
+            if (
+                entry.type !== 'root' &&
+                entry.pos.length === 0
+            ) {
+                errors.push(
+                    '请选择至少一个词性。'
+                );
+            }
+
+            if (
+                !entry.senses[0].definition
+            ) {
+                errors.push('请填写释义。');
+            }
+
+
+            return errors;
+
+        }
+
+
+        function update() {
+
+            const entry =
+                buildEntry();
+
+            const errors =
+                validateEntry(entry);
+
+
+            output.value =
+                JSON.stringify(
+                    entry,
+                    null,
+                    2
+                );
+
+
+            if (errors.length > 0) {
+
+                validation.className =
+                    'validation error';
+
+                validation.textContent =
+                    errors.join(' ');
+
+                copyButton.disabled = true;
+
+                return;
+
+            }
+
+
+            validation.className =
+                'validation valid';
+
+            validation.textContent =
+                '✓ 当前基本字段有效';
+
+            copyButton.disabled = false;
+
+        }
+
+
+        headword.addEventListener(
+            'input',
+            () => {
+
+                if (!idEditedManually) {
+                    idInput.value =
+                        makeId(headword.value);
+                }
+
+                update();
+
+            }
+        );
+
+
+        idInput.addEventListener(
+            'input',
+            () => {
+
+                idEditedManually = true;
+
+                update();
+
+            }
+        );
+
+
+        regenerateId.addEventListener(
+            'click',
+            () => {
+
+                idEditedManually = false;
+
+                idInput.value =
+                    makeId(headword.value);
+
+                update();
+
+            }
+        );
+
+
+        root
+            .querySelectorAll(
+                'input, textarea, select'
+            )
+            .forEach((element) => {
+
+                if (
+                    element === headword ||
+                    element === idInput
+                ) {
+                    return;
+                }
+
+                element.addEventListener(
+                    'input',
+                    update
+                );
+
+                element.addEventListener(
+                    'change',
+                    update
+                );
+
+            });
+
+
+        copyButton.addEventListener(
+            'click',
+            async () => {
+
+                if (copyButton.disabled) {
+                    return;
+                }
+
+                try {
+
+                    await navigator.clipboard
+                        .writeText(
+                            output.value
+                        );
+
+                    const oldText =
+                        copyButton.textContent;
+
+                    copyButton.textContent =
+                        '已复制';
+
+                    window.setTimeout(
+                        () => {
+                            copyButton.textContent =
+                                oldText;
+                        },
+                        1200
+                    );
+
+                }
+                catch {
+
+                    validation.className =
+                        'validation error';
+
+                    validation.textContent =
+                        '复制失败，请手动复制 JSON。';
+
+                }
+
+            }
+        );
+
+
+        update();
+
+    }
+
+
+    initialiseEntryBuilder();
+
+</script>

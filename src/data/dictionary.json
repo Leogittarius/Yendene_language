@@ -441,7 +441,7 @@
       "id": "ma-",
       "headword": "ma-",
 
-      "type": "simple",
+      "type": "affix",
 
       "pos": [
         "affix"
@@ -490,8 +490,131 @@
       "tags": [],
 
       "notes": ""
-    }
+    },
+    {
+      "id": "talge",
+      "headword": "talge",
 
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "人，人类",
+          "gloss": "人"
+        }
+      ],
+
+      "formation": {
+        "type": "simple",
+        "components": []
+      },
+
+      "etymology": "",
+
+      "variants": [],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
+    },
+    {
+      "id": "yem-dan",
+      "headword": "Yem Dan",
+
+      "type": "word",
+
+      "pos": [
+        "noun"
+      ],
+
+      "pronunciation": {
+        "ipa": ""
+      },
+
+      "senses": [
+        {
+          "definition": "叶牡丹（地名）",
+          "gloss": "叶牡丹"
+        }
+      ],
+
+      "formation": {
+        "type": "simple",
+        "components": []
+      },
+
+      "etymology": "",
+
+      "variants": [],
+
+      "relations": {
+        "related": [],
+        "synonyms": [],
+        "antonyms": [],
+        "derived": []
+      },
+
+      "examples": [],
+
+      "status": "established",
+
+      "tags": [],
+
+      "notes": ""
+    },
+    {
+  "id": "cartanda",
+  "headword": "cartanda",
+  "type": "word",
+  "pos": [
+    "verb"
+  ],
+  "pronunciation": {
+    "ipa": ""
+  },
+  "senses": [
+    {
+      "definition": "找到，发现",
+      "gloss": "找到"
+    }
+  ],
+  "formation": {
+    "type": "simple",
+    "analysis": "",
+    "components": []
+  },
+  "etymology": "",
+  "variants": [],
+  "relations": {
+    "related": [],
+    "synonyms": [],
+    "antonyms": [],
+    "derived": []
+  },
+  "examples": [],
+  "status": "established",
+  "tags": [],
+  "notes": ""
+}
     
   ]
 }

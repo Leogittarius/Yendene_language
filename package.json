@@ -5,6 +5,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    
+    "validate:dictionary": "node scripts/validate-dictionary.mjs",
+
+    "prebuild": "npm run validate:dictionary",
+
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
