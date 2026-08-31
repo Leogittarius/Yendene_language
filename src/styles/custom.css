@@ -371,3 +371,863 @@ body:has(.dictionary) {
 body:has(.entry-builder) {
     --sl-content-width: 72rem;
 }
+
+
+
+
+/* =========================================================
+   Entry Builder
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   Basic control reset
+   --------------------------------------------------------- */
+
+.entry-builder *,
+.entry-builder *::before,
+.entry-builder *::after {
+    box-sizing: border-box;
+}
+
+
+.entry-builder input[type='text'],
+.entry-builder textarea,
+.entry-builder select {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    border: 1px solid var(--sl-color-hairline) !important;
+    border-radius: 0.45rem !important;
+
+    background: var(--sl-color-bg) !important;
+    color: var(--sl-color-white) !important;
+
+    font: inherit !important;
+    font-size: 0.88rem !important;
+
+    outline: none !important;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+.entry-builder input[type='text'],
+.entry-builder select {
+    height: 2.5rem !important;
+
+    padding: 0 0.7rem !important;
+}
+
+
+.entry-builder textarea:not(.json-output) {
+    min-height: 4.6rem !important;
+
+    padding: 0.6rem 0.7rem !important;
+
+    resize: none !important;
+}
+
+
+.entry-builder input[type='text']:focus,
+.entry-builder textarea:focus,
+.entry-builder select:focus {
+    border-color: var(--sl-color-accent) !important;
+
+    box-shadow:
+        0 0 0 2px
+        var(--sl-color-accent-low) !important;
+}
+
+
+/* ---------------------------------------------------------
+   JSON output
+   --------------------------------------------------------- */
+
+.entry-builder .json-output {
+    width: 100% !important;
+
+    min-height: 38rem !important;
+    height: 38rem !important;
+
+    padding: 0.75rem !important;
+
+    resize: vertical !important;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        monospace !important;
+
+    font-size: 0.8rem !important;
+    line-height: 1.55 !important;
+}
+
+
+/* ---------------------------------------------------------
+   Labels
+   --------------------------------------------------------- */
+
+.entry-builder .field {
+    display: block;
+
+    min-width: 0;
+
+    margin: 0 !important;
+}
+
+
+.entry-builder .field-label {
+    display: block;
+
+    margin: 0 0 0.35rem !important;
+
+    color: var(--sl-color-gray-2);
+
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+
+.entry-builder .field-help {
+    display: block;
+
+    margin: 0.35rem 0 0 !important;
+
+    color: var(--sl-color-gray-3);
+
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+
+/* ---------------------------------------------------------
+   Buttons
+   --------------------------------------------------------- */
+
+.entry-builder button.small-button,
+.entry-builder button.copy-button,
+.entry-builder button.delete-button {
+    appearance: none !important;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: auto !important;
+
+    margin: 0 !important;
+
+    border: 1px solid var(--sl-color-hairline) !important;
+    border-radius: 0.45rem !important;
+
+    background: transparent !important;
+    color: var(--sl-color-gray-1) !important;
+
+    font: inherit !important;
+    line-height: 1 !important;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+
+.entry-builder button.small-button,
+.entry-builder button.copy-button {
+    min-height: 2.3rem;
+
+    padding: 0 0.75rem !important;
+
+    font-size: 0.78rem !important;
+}
+
+
+.entry-builder button.delete-button {
+    min-height: 1.9rem;
+
+    padding: 0 0.55rem !important;
+
+    color: var(--sl-color-gray-3) !important;
+
+    font-size: 0.72rem !important;
+}
+
+
+.entry-builder button.small-button:hover,
+.entry-builder button.copy-button:not(:disabled):hover {
+    border-color: var(--sl-color-accent) !important;
+
+    background: var(--sl-color-accent-low) !important;
+}
+
+
+.entry-builder button.delete-button:hover {
+    border-color: #b56e72 !important;
+
+    background: rgba(181, 110, 114, 0.08) !important;
+
+    color: #bd7377 !important;
+}
+
+
+.entry-builder button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+/* ---------------------------------------------------------
+   Dynamic cards
+   --------------------------------------------------------- */
+
+.entry-builder .dynamic-item {
+    margin: 0 0 0.75rem !important;
+
+    padding: 0.9rem !important;
+
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 0.5rem;
+
+    background: rgba(120, 155, 170, 0.025);
+}
+
+
+.entry-builder .dynamic-item:last-child {
+    margin-bottom: 0 !important;
+}
+
+
+.entry-builder .dynamic-item-header {
+    display: flex !important;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+
+    margin: 0 0 0.8rem !important;
+}
+
+
+.entry-builder .dynamic-item-title {
+    color: var(--sl-color-gray-1);
+
+    font-size: 0.84rem;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   Senses
+   ========================================================= */
+
+.entry-builder .sense-fields {
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1.2fr)
+        minmax(0, 0.8fr) !important;
+
+    gap: 0.75rem !important;
+
+    align-items: stretch;
+}
+
+
+.entry-builder .sense-definition,
+.entry-builder .sense-gloss {
+    height: 4.6rem !important;
+    min-height: 4.6rem !important;
+}
+
+
+
+
+/* =========================================================
+   Variants
+   ========================================================= */
+
+.entry-builder .variant-item .sense-fields {
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr) !important;
+
+    align-items: end;
+}
+
+
+.entry-builder .variant-form,
+.entry-builder .variant-label {
+    height: 2.5rem !important;
+}
+
+
+/* =========================================================
+   Formation components
+   ========================================================= */
+
+.entry-builder .component-item {
+    margin: 0 0 0.75rem !important;
+
+    padding: 0.85rem !important;
+
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 0.5rem;
+}
+
+
+.entry-builder .component-fields {
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1.25fr)
+        minmax(0, 0.75fr) !important;
+
+    gap: 0.75rem !important;
+
+    align-items: start;
+}
+
+
+.entry-builder .component-picker {
+    position: relative;
+
+    min-width: 0;
+}
+
+
+.entry-builder .component-search,
+.entry-builder .component-form {
+    width: 100% !important;
+}
+
+
+.entry-builder .component-status {
+    display: block;
+
+    margin-top: 0.35rem;
+
+    color: var(--sl-color-gray-3);
+
+    font-size: 0.72rem;
+}
+
+
+.entry-builder .component-results {
+    position: absolute !important;
+
+    z-index: 80;
+
+    top: calc(2.5rem + 1.7rem);
+    left: 0;
+    right: 0;
+
+    max-height: 18rem;
+
+    overflow-y: auto;
+
+    padding: 0 !important;
+
+    border: 1px solid var(--sl-color-hairline) !important;
+    border-radius: 0.5rem !important;
+
+    background: var(--sl-color-bg) !important;
+
+    box-shadow:
+        0 0.65rem 1.6rem
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.entry-builder .component-results[hidden] {
+    display: none !important;
+}
+
+
+.entry-builder button.component-result {
+    appearance: none !important;
+
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0.6rem 0.7rem !important;
+
+    border: 0 !important;
+    border-bottom:
+        1px solid
+        var(--sl-color-hairline-light) !important;
+
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    color: var(--sl-color-gray-1) !important;
+
+    font: inherit !important;
+    text-align: left !important;
+
+    cursor: pointer;
+}
+
+
+.entry-builder button.component-result:last-child {
+    border-bottom: 0 !important;
+}
+
+
+.entry-builder button.component-result:hover {
+    background: var(--sl-color-accent-low) !important;
+}
+
+
+.entry-builder .result-head {
+    display: flex;
+
+    align-items: baseline;
+    flex-wrap: wrap;
+
+    gap: 0.45rem;
+}
+
+
+.entry-builder .result-headword {
+    font-weight: 650;
+}
+
+
+.entry-builder .result-id {
+    color: var(--sl-color-gray-3);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        monospace;
+
+    font-size: 0.7rem;
+}
+
+
+.entry-builder .result-description {
+    display: block;
+
+    margin-top: 0.15rem;
+
+    color: var(--sl-color-gray-3);
+
+    font-size: 0.73rem;
+}
+
+
+/* =========================================================
+   Relations
+   ========================================================= */
+
+.entry-builder .relation-editor {
+    display: grid;
+
+    gap: 0.8rem;
+}
+
+
+.entry-builder .relation-group {
+    padding: 0.85rem;
+
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 0.5rem;
+}
+
+
+.entry-builder .relation-picker {
+    position: relative;
+}
+
+
+.entry-builder .relation-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 0.4rem;
+
+    margin: 0 0 0.55rem !important;
+}
+
+
+.entry-builder .relation-chip-list:empty {
+    display: none;
+}
+
+
+.entry-builder .relation-suggestions {
+    position: absolute !important;
+
+    z-index: 100;
+
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+
+    max-height: 18rem;
+
+    overflow-y: auto;
+
+    padding: 0 !important;
+
+    border: 1px solid var(--sl-color-hairline) !important;
+    border-radius: 0.5rem !important;
+
+    background: var(--sl-color-bg) !important;
+
+    box-shadow:
+        0 0.65rem 1.6rem
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.entry-builder .relation-suggestions[hidden] {
+    display: none !important;
+}
+
+
+.entry-builder button.relation-suggestion {
+    appearance: none !important;
+
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0.6rem 0.7rem !important;
+
+    border: 0 !important;
+    border-bottom:
+        1px solid
+        var(--sl-color-hairline-light) !important;
+
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    color: var(--sl-color-gray-1) !important;
+
+    font: inherit !important;
+    text-align: left !important;
+
+    cursor: pointer;
+}
+
+
+.entry-builder button.relation-suggestion:last-child {
+    border-bottom: 0 !important;
+}
+
+
+.entry-builder button.relation-suggestion:hover {
+    background: var(--sl-color-accent-low) !important;
+}
+
+
+.entry-builder .relation-suggestion-head {
+    display: flex;
+
+    align-items: baseline;
+    flex-wrap: wrap;
+
+    gap: 0.45rem;
+}
+
+
+.entry-builder .relation-suggestion-headword {
+    font-weight: 650;
+}
+
+
+.entry-builder .relation-suggestion-id {
+    color: var(--sl-color-gray-3);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        monospace;
+
+    font-size: 0.7rem;
+}
+
+
+.entry-builder .relation-suggestion-definition {
+    display: block;
+
+    margin-top: 0.15rem;
+
+    color: var(--sl-color-gray-3);
+
+    font-size: 0.73rem;
+}
+
+
+/* =========================================================
+   Tags
+   ========================================================= */
+
+.entry-builder .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 0.4rem;
+
+    margin-bottom: 0.65rem !important;
+}
+
+
+.entry-builder .tag-list:empty {
+    display: none;
+}
+
+
+.entry-builder .tag-input-row {
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto !important;
+
+    gap: 0.5rem !important;
+}
+
+
+.entry-builder .tag-picker {
+    position: relative;
+}
+
+
+.entry-builder .tag-suggestions {
+    position: absolute !important;
+
+    z-index: 110;
+
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+
+    max-height: 18rem;
+
+    overflow-y: auto;
+
+    padding: 0 !important;
+
+    border: 1px solid var(--sl-color-hairline) !important;
+    border-radius: 0.5rem !important;
+
+    background: var(--sl-color-bg) !important;
+
+    box-shadow:
+        0 0.65rem 1.6rem
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.entry-builder .tag-suggestions[hidden] {
+    display: none !important;
+}
+
+
+.entry-builder button.tag-suggestion {
+    appearance: none !important;
+
+    display: flex !important;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 1rem;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0.6rem 0.7rem !important;
+
+    border: 0 !important;
+    border-bottom:
+        1px solid
+        var(--sl-color-hairline-light) !important;
+
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    color: var(--sl-color-gray-1) !important;
+
+    font: inherit !important;
+    text-align: left !important;
+
+    cursor: pointer;
+}
+
+
+.entry-builder button.tag-suggestion:last-child {
+    border-bottom: 0 !important;
+}
+
+
+.entry-builder button.tag-suggestion:hover {
+    background: var(--sl-color-accent-low) !important;
+}
+
+
+/* =========================================================
+   Examples — basic control normalization
+   ========================================================= */
+
+.entry-builder .example-item {
+    padding: 1rem;
+
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.55rem;
+}
+
+
+.entry-builder .example-component {
+    margin: 0 0 0.75rem !important;
+
+    padding: 0.9rem !important;
+
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 0.5rem;
+}
+
+
+.entry-builder .example-search-results {
+    z-index: 120;
+
+    border: 1px solid var(--sl-color-hairline) !important;
+    border-radius: 0.5rem !important;
+
+    background: var(--sl-color-bg) !important;
+
+    box-shadow:
+        0 0.65rem 1.6rem
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.entry-builder button.example-search-result {
+    appearance: none !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0.6rem 0.7rem !important;
+
+    border: 0 !important;
+    border-bottom:
+        1px solid
+        var(--sl-color-hairline-light) !important;
+
+    border-radius: 0 !important;
+
+    background: transparent !important;
+
+    color: var(--sl-color-gray-1) !important;
+
+    font: inherit !important;
+    text-align: left !important;
+
+    cursor: pointer;
+}
+
+
+.entry-builder button.example-search-result:hover {
+    background: var(--sl-color-accent-low) !important;
+}
+
+
+/* ---------------------------------------------------------
+   Mobile
+   --------------------------------------------------------- */
+
+@media (max-width: 48rem) {
+
+    .entry-builder .sense-fields,
+    .entry-builder .variant-item .sense-fields,
+    .entry-builder .component-fields {
+        grid-template-columns: 1fr !important;
+    }
+
+}
+
+
+/* Entry Builder: prevent action buttons from wrapping */
+
+.entry-builder .section-header > .small-button,
+.entry-builder .component-header > .small-button,
+.entry-builder .example-actions > .small-button {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    width: auto !important;
+}
+
+
+/* Entry Builder: relation chips */
+
+.entry-builder .relation-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+
+    gap: 0.4rem !important;
+
+    padding: 0.32rem 0.55rem !important;
+
+    border: 1px solid var(--sl-color-hairline) !important;
+    border-radius: 999px !important;
+
+    background: var(--sl-color-accent-low) !important;
+
+    color: var(--sl-color-gray-1) !important;
+
+    font-size: 0.78rem !important;
+}
+
+
+.entry-builder .relation-chip.pending {
+    border-style: dashed !important;
+
+    background: transparent !important;
+}
+
+
+.entry-builder .relation-chip-remove {
+    appearance: none !important;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: 1rem !important;
+    height: 1rem !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+
+    background: transparent !important;
+
+    color: var(--sl-color-gray-3) !important;
+
+    line-height: 1 !important;
+
+    cursor: pointer;
+}

@@ -1680,6 +1680,10 @@ const lookupJson =
             var(--sl-color-accent-high);
     }
 
+
+
+
+
 </style>
 
 
@@ -2532,11 +2536,11 @@ const lookupJson =
                             Gloss
                         </span>
 
-                        <input
+                        <textarea
                             class="sense-gloss"
-                            type="text"
+                            rows="2"
                             placeholder="自动取第一个释义"
-                        />
+                        ></textarea>
                     </label>
 
                 </div>
@@ -5516,17 +5520,6 @@ const lookupJson =
                 label || cleanRef;
 
 
-            const id =
-                document.createElement(
-                    'span'
-                );
-
-            id.className =
-                'relation-chip-id';
-
-            id.textContent =
-                cleanRef;
-
 
             const removeButton =
                 document.createElement(
@@ -5548,9 +5541,11 @@ const lookupJson =
             );
 
 
+            chip.title =
+               `ID: ${cleanRef}`;
+
             chip.append(
                 text,
-                id,
                 removeButton
             );
 
