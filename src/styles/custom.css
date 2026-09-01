@@ -1729,27 +1729,279 @@ button.entry-tag-button {
 }
 
 
-/* =====================================================
-   Reset Starlight prose margins inside statistic groups
-   ===================================================== */
+/* =========================================================
+   Entry Builder edit mode
+   ========================================================= */
 
-.summary-grid > *,
-.coverage-list > *,
-.stat-list > *,
-.tag-stats > *,
-.draft-list > *,
-.unresolved-list > *,
-.reference-sources > * {
-    margin: 0 !important;
+.entry-builder .builder-mode-section {
+    position: relative;
 }
 
 
-.stat-row,
-.coverage-row {
-    align-self: stretch;
+/* ---------------------------------------------------------
+   Mode switch
+   --------------------------------------------------------- */
+
+.entry-builder .entry-mode-switch {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 0.45rem;
+
+    margin-top: 0.8rem;
 }
 
-.tag-stat {
+
+.entry-builder button.mode-button {
+    appearance: none !important;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 2.3rem;
+
     margin: 0 !important;
-    min-height: 2rem;
+    padding: 0 0.8rem !important;
+
+    border:
+        1px solid
+        var(--sl-color-hairline) !important;
+
+    border-radius:
+        0.45rem !important;
+
+    background:
+        transparent !important;
+
+    color:
+        var(--sl-color-gray-2) !important;
+
+    font: inherit !important;
+    font-size: 0.8rem !important;
+
+    cursor: pointer;
+
+    transition:
+        border-color 150ms ease,
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+
+.entry-builder button.mode-button:hover {
+    border-color:
+        var(--sl-color-accent) !important;
+}
+
+
+.entry-builder button.mode-button.is-active {
+    border-color:
+        var(--sl-color-accent) !important;
+
+    background:
+        var(--sl-color-accent-low) !important;
+
+    color:
+        var(--sl-color-accent-high) !important;
+}
+
+
+/* ---------------------------------------------------------
+   Edit panel
+   --------------------------------------------------------- */
+
+.entry-builder .edit-panel {
+    position: relative;
+
+    margin-top: 1rem;
+
+    padding-top: 1rem;
+
+    border-top:
+        1px solid
+        var(--sl-color-hairline-light);
+}
+
+
+.entry-builder .edit-panel[hidden] {
+    display: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   Search results
+   --------------------------------------------------------- */
+
+.entry-builder .edit-results {
+    position: absolute;
+
+    z-index: 150;
+
+    left: 0;
+    right: 0;
+
+    margin-top: 0.35rem;
+
+    max-height: 20rem;
+
+    overflow-y: auto;
+
+    padding: 0 !important;
+
+    border:
+        1px solid
+        var(--sl-color-hairline);
+
+    border-radius:
+        0.5rem;
+
+    background:
+        var(--sl-color-bg);
+
+    box-shadow:
+        0
+        0.65rem
+        1.6rem
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.entry-builder .edit-results[hidden] {
+    display: none !important;
+}
+
+
+.entry-builder button.edit-entry-result {
+    appearance: none !important;
+
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0.65rem 0.75rem !important;
+
+    border: 0 !important;
+
+    border-bottom:
+        1px solid
+        var(--sl-color-hairline-light) !important;
+
+    border-radius: 0 !important;
+
+    background:
+        transparent !important;
+
+    color:
+        var(--sl-color-gray-1) !important;
+
+    text-align: left !important;
+
+    font: inherit !important;
+
+    cursor: pointer;
+}
+
+
+.entry-builder button.edit-entry-result:last-child {
+    border-bottom: 0 !important;
+}
+
+
+.entry-builder button.edit-entry-result:hover {
+    background:
+        var(--sl-color-accent-low) !important;
+}
+
+
+.entry-builder .edit-result-head {
+    display: flex;
+
+    align-items: baseline;
+    flex-wrap: wrap;
+
+    gap: 0.5rem;
+}
+
+
+.entry-builder .edit-result-headword {
+    font-weight: 650;
+}
+
+
+.entry-builder .edit-result-id {
+    color:
+        var(--sl-color-gray-3);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        monospace;
+
+    font-size: 0.72rem;
+}
+
+
+.entry-builder .edit-result-definition {
+    display: block;
+
+    margin-top: 0.18rem;
+
+    color:
+        var(--sl-color-gray-3);
+
+    font-size: 0.75rem;
+}
+
+
+/* ---------------------------------------------------------
+   Currently editing
+   --------------------------------------------------------- */
+
+.entry-builder .edit-current {
+    margin-top: 0.75rem;
+
+    padding: 0.65rem 0.75rem;
+
+    border:
+        1px solid
+        var(--sl-color-accent);
+
+    border-radius:
+        0.45rem;
+
+    background:
+        var(--sl-color-accent-low);
+
+    color:
+        var(--sl-color-accent-high);
+
+    font-size: 0.8rem;
+}
+
+
+.entry-builder .edit-current[hidden] {
+    display: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   Locked ID
+   --------------------------------------------------------- */
+
+.entry-builder #eb-id[readonly] {
+    opacity: 0.78;
+
+    cursor: not-allowed;
+}
+
+
+/* ---------------------------------------------------------
+   Partial edit warning
+   --------------------------------------------------------- */
+
+.entry-builder .validation.warning {
+    color: #b47b34;
 }

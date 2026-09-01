@@ -4,7 +4,15 @@ import dictionary from '@data/dictionary.json';
 const lookupEntries = dictionary.entries.map((entry) => ({
     id: entry.id,
     headword: entry.headword,
-    pos: entry.pos ?? [],
+
+    type:
+        entry.type ?? 'word',
+
+    pos:
+        entry.pos ?? [],
+
+    status:
+        entry.status ?? 'established',
 
     senses: (entry.senses ?? []).map((sense) => ({
         definition: sense.definition ?? '',
@@ -38,6 +46,90 @@ const lookupJson =
 <div class="entry-builder">
 
     <div class="builder-form">
+
+
+    <!-- =====================================
+         Builder mode
+         ===================================== -->
+
+    <section class="builder-section builder-mode-section">
+
+        <h2>工作模式</h2>
+
+        <div
+            class="entry-mode-switch"
+            role="group"
+            aria-label="词条生成器工作模式"
+        >
+
+            <button
+                id="eb-mode-new"
+                class="mode-button is-active"
+                type="button"
+                aria-pressed="true"
+            >
+                新建词条
+            </button>
+
+            <button
+                id="eb-mode-edit"
+                class="mode-button"
+                type="button"
+                aria-pressed="false"
+            >
+                编辑已有词条
+            </button>
+
+        </div>
+
+
+        <div
+            id="eb-edit-panel"
+            class="edit-panel"
+            hidden
+        >
+
+            <label class="field">
+
+                <span class="field-label">
+                    选择已有词条
+                </span>
+
+                <input
+                    id="eb-edit-search"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="搜索 ID、词形或释义……"
+                />
+
+            </label>
+
+
+            <div
+                id="eb-edit-results"
+                class="edit-results"
+                hidden
+            ></div>
+
+
+            <div
+                id="eb-edit-current"
+                class="edit-current"
+                hidden
+            ></div>
+
+
+            <span class="field-help">
+                当前为编辑模式第一阶段：
+                暂时只导入基本信息和义项，
+                因此不会允许复制替换 JSON。
+            </span>
+
+        </div>
+
+    </section>
+
+
 
         <!-- =====================================
              Basic information
@@ -2171,6 +2263,38 @@ const lookupJson =
            Elements
            ===================================== */
 
+        const modeNewButton =
+            root.querySelector(
+                '#eb-mode-new'
+            );
+
+        const modeEditButton =
+            root.querySelector(
+                '#eb-mode-edit'
+            );
+
+        const editPanel =
+            root.querySelector(
+                '#eb-edit-panel'
+            );
+
+        const editSearch =
+            root.querySelector(
+                '#eb-edit-search'
+            );
+
+        const editResults =
+            root.querySelector(
+                '#eb-edit-results'
+            );
+
+        const editCurrent =
+            root.querySelector(
+                '#eb-edit-current'
+            );
+
+
+
         const headword =
             root.querySelector('#eb-headword');
 
@@ -2292,9 +2416,472 @@ const lookupJson =
             root.querySelector('#eb-copy');
 
 
-        let idEditedManually = false;
+        let idEditedManually =
+            false;
 
 
+        /*
+        * 当前工作模式：
+        *
+        * new
+        * edit
+        */
+        let builderMode =
+            'new';
+
+
+        /*
+        * 当前正在编辑的稳定 ID。
+        *
+        * 新建模式时为 null。
+        */
+        let editingId =
+            null;
+
+        /* =====================================
+        Edit mode
+        ===================================== */
+
+
+        /*
+        * 编辑搜索专用的标准化。
+        */
+        function normalizeEditSearch(
+            value
+        ) {
+
+            return String(value)
+                .normalize('NFD')
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ''
+                )
+                .toLowerCase()
+                .trim();
+
+        }
+
+
+        /*
+        * 一个词条用于编辑搜索的完整文字。
+        */
+        function getEditSearchText(
+            entry
+        ) {
+
+            return normalizeEditSearch([
+                entry.id,
+                entry.headword,
+
+                ...(entry.definitions ?? []),
+                ...(entry.glosses ?? []),
+                ...(entry.variants ?? []),
+            ].join(' '));
+
+        }
+
+
+        /*
+        * 更新两个模式按钮的外观。
+        */
+        function updateModeButtons() {
+
+            const isNew =
+                builderMode === 'new';
+
+
+            modeNewButton.classList.toggle(
+                'is-active',
+                isNew
+            );
+
+            modeNewButton.setAttribute(
+                'aria-pressed',
+                String(isNew)
+            );
+
+
+            modeEditButton.classList.toggle(
+                'is-active',
+                !isNew
+            );
+
+            modeEditButton.setAttribute(
+                'aria-pressed',
+                String(!isNew)
+            );
+
+
+            editPanel.hidden =
+                isNew;
+
+        }
+
+
+        /*
+        * 第一阶段暂时不导入：
+        *
+        * Formation
+        * Variants
+        * Relations
+        * Examples
+        * Tags
+        * IPA
+        * Etymology
+        * Notes
+        *
+        * 为了避免这些区域残留旧内容，
+        * 进入编辑词条时先清空。
+        *
+        * 第二阶段这里会被完整导入逻辑替代。
+        */
+        function clearNonImportedFieldsForEdit() {
+
+            formationType.value =
+                'simple';
+
+            analysis.value =
+                '';
+
+            componentList.innerHTML =
+                '';
+
+            updateComponentVisibility();
+
+
+            variantList.innerHTML =
+                '';
+
+
+            relationSection
+                .querySelectorAll(
+                    '.relation-chip'
+                )
+                .forEach(
+                    (chip) => {
+                        chip.remove();
+                    }
+                );
+
+
+            exampleList.innerHTML =
+                '';
+
+
+            tagList.innerHTML =
+                '';
+
+
+            ipa.value =
+                '';
+
+            etymology.value =
+                '';
+
+            notes.value =
+                '';
+
+        }
+
+
+        /*
+        * 把已有词条的 Basic + Senses
+        * 反向载入现有表单。
+        */
+        function loadEntryForEdit(
+            entry
+        ) {
+
+            builderMode =
+                'edit';
+
+            editingId =
+                entry.id;
+
+
+            updateModeButtons();
+
+
+            /*
+            * Basic
+            */
+
+            headword.value =
+                entry.headword ?? '';
+
+            idInput.value =
+                entry.id ?? '';
+
+            /*
+            * ID 是稳定引用，
+            * 编辑模式第一版直接锁定。
+            */
+            idInput.readOnly =
+                true;
+
+            regenerateId.disabled =
+                true;
+
+            idEditedManually =
+                true;
+
+
+            type.value =
+                entry.type ?? 'word';
+
+
+            root.querySelectorAll(
+                'input[name="pos"]'
+            )
+                .forEach(
+                    (checkbox) => {
+
+                        checkbox.checked =
+                            (entry.pos ?? [])
+                                .includes(
+                                    checkbox.value
+                                );
+
+                    }
+                );
+
+
+            status.value =
+                entry.status ??
+                'established';
+
+
+            /*
+            * 当前 ID 本来就存在，
+            * 但这是我们正在编辑的那个，
+            * 所以它是合法的。
+            */
+            idMessage.className =
+                'field-help valid';
+
+            idMessage.textContent =
+                `✓ 正在编辑现有 ID "${entry.id}"。`;
+
+
+            /*
+            * Senses
+            */
+
+            senseList.innerHTML =
+                '';
+
+
+            const senses =
+                entry.senses ?? [];
+
+
+            if (
+                senses.length === 0
+            ) {
+
+                addSense();
+
+            }
+            else {
+
+                senses.forEach(
+                    (sense) => {
+
+                        addSense(
+                            sense.definition ?? '',
+                            sense.gloss ?? ''
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /*
+            * 第一阶段其他字段清空。
+            */
+            clearNonImportedFieldsForEdit();
+
+
+            /*
+            * 顶部显示当前编辑目标。
+            */
+            editSearch.value =
+                entry.headword ?? entry.id;
+
+
+            editCurrent.hidden =
+                false;
+
+            editCurrent.textContent =
+                `正在编辑：${entry.headword} · ID: ${entry.id}`;
+
+
+            editResults.hidden =
+                true;
+
+
+            update();
+
+        }
+
+
+        /*
+        * 渲染已有词条搜索结果。
+        */
+        function renderEditResults() {
+
+            const rawQuery =
+                editSearch.value.trim();
+
+
+            const query =
+                normalizeEditSearch(
+                    rawQuery
+                );
+
+
+            editResults.innerHTML =
+                '';
+
+
+            if (!query) {
+
+                editResults.hidden =
+                    true;
+
+                return;
+
+            }
+
+
+            const matches =
+                existingEntries
+
+                    .filter(
+                        (entry) =>
+                            getEditSearchText(
+                                entry
+                            ).includes(
+                                query
+                            )
+                    )
+
+                    .slice(
+                        0,
+                        10
+                    );
+
+
+            matches.forEach(
+                (entry) => {
+
+                    const button =
+                        document.createElement(
+                            'button'
+                        );
+
+
+                    button.type =
+                        'button';
+
+                    button.className =
+                        'edit-entry-result';
+
+
+                    const head =
+                        document.createElement(
+                            'span'
+                        );
+
+                    head.className =
+                        'edit-result-head';
+
+
+                    const headwordElement =
+                        document.createElement(
+                            'span'
+                        );
+
+                    headwordElement.className =
+                        'edit-result-headword';
+
+                    headwordElement.textContent =
+                        entry.headword;
+
+
+                    const idElement =
+                        document.createElement(
+                            'span'
+                        );
+
+                    idElement.className =
+                        'edit-result-id';
+
+                    idElement.textContent =
+                        `ID: ${entry.id}`;
+
+
+                    head.append(
+                        headwordElement,
+                        idElement
+                    );
+
+
+                    button.appendChild(
+                        head
+                    );
+
+
+                    if (
+                        entry.definitions?.[0]
+                    ) {
+
+                        const definition =
+                            document.createElement(
+                                'span'
+                            );
+
+                        definition.className =
+                            'edit-result-definition';
+
+                        definition.textContent =
+                            entry.definitions[0];
+
+
+                        button.appendChild(
+                            definition
+                        );
+
+                    }
+
+
+                    button.addEventListener(
+                        'click',
+                        () => {
+
+                            loadEntryForEdit(
+                                entry
+                            );
+
+                        }
+                    );
+
+
+                    editResults.appendChild(
+                        button
+                    );
+
+                }
+            );
+
+
+            editResults.hidden =
+                editResults.children.length ===
+                0;
+
+        }
         /* =====================================
            ID
            ===================================== */
@@ -2418,7 +3005,10 @@ const lookupJson =
                 return;
             }
 
-            if (existingIds.has(value)) {
+            if (
+                existingIds.has(value) &&
+                value !== editingId
+            ) {
                 idMessage.className =
                     'field-help warning';
 
@@ -6698,7 +7288,8 @@ const lookupJson =
             else if (
                 existingIds.has(
                     entry.id
-                )
+                )&&
+                entry.id !== editingId
             ) {
                 errors.push(
                     `ID "${entry.id}" 已存在。`
@@ -6922,6 +7513,45 @@ const lookupJson =
             }
 
 
+            /*
+            * 编辑模式第一阶段只导入
+            * Basic + Senses。
+            *
+            * 为防止误覆盖旧词条，
+            * 暂时禁止复制。
+            */
+            if (
+                builderMode === 'edit'
+            ) {
+
+                validation.className =
+                    'validation warning';
+
+
+                if (editingId) {
+
+                    validation.textContent =
+                        `正在编辑 "${editingId}"。` +
+                        ` 当前第一阶段只导入基本信息和义项，` +
+                        ` 暂不可复制替换 JSON。`;
+
+                }
+                else {
+
+                    validation.textContent =
+                        '编辑模式：请选择一个已有词条。';
+
+                }
+
+
+                copyButton.disabled =
+                    true;
+
+                return;
+
+            }
+
+
             validation.className =
                 'validation valid';
 
@@ -6938,13 +7568,133 @@ const lookupJson =
            Events
            ===================================== */
 
+
+        /*
+        * 进入编辑模式。
+        */
+        modeEditButton.addEventListener(
+            'click',
+            () => {
+
+                builderMode =
+                    'edit';
+
+                editingId =
+                    null;
+
+
+                updateModeButtons();
+
+
+                idInput.readOnly =
+                    true;
+
+                regenerateId.disabled =
+                    true;
+
+
+                editCurrent.hidden =
+                    true;
+
+                editSearch.value =
+                    '';
+
+                editResults.hidden =
+                    true;
+
+
+                editSearch.focus();
+
+
+                update();
+
+            }
+        );
+
+
+        /*
+        * 返回新建模式。
+        *
+        * 第一阶段最安全的做法是直接刷新页面，
+        * 得到一个完全干净的新词条表单。
+        */
+        modeNewButton.addEventListener(
+            'click',
+            () => {
+
+                if (
+                    builderMode === 'new'
+                ) {
+                    return;
+                }
+
+
+                window.location.href =
+                    window.location.pathname;
+
+            }
+        );
+
+
+        /*
+        * 搜索已有词条。
+        */
+        editSearch.addEventListener(
+            'input',
+            () => {
+
+                renderEditResults();
+
+            }
+        );
+
+
+        /*
+        * 点击搜索区外部，
+        * 关闭已有词条搜索结果。
+        */
+        document.addEventListener(
+            'click',
+            (event) => {
+
+                if (
+                    event.target.closest(
+                        '.edit-panel'
+                    )
+                ) {
+                    return;
+                }
+
+
+                editResults.hidden =
+                    true;
+
+            }
+        );
+
+
+
+
         headword.addEventListener(
             'input',
             () => {
 
-                if (!idEditedManually) {
+                /*
+                * 新建模式：
+                * 仍然根据 headword 自动建议 ID。
+                *
+                * 编辑模式：
+                * ID 是稳定引用，不允许跟着变化。
+                */
+                if (
+                    builderMode === 'new' &&
+                    !idEditedManually
+                ) {
+
                     updateAutomaticId();
+
                 }
+
 
                 update();
 
@@ -7094,6 +7844,8 @@ const lookupJson =
                         headword ||
                     event.target ===
                         idInput ||
+                    event.target ===
+                        editSearch ||
                     event.target.closest(
                         '.component-search'
                     )
