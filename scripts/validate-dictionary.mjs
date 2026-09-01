@@ -581,7 +581,7 @@ entries.forEach((entry, index) => {
                 if (!idSet.has(ref)) {
                     warning(
                         `${where}: relations.${type} ` +
-                        `引用的 id "${component.ref}" ` +
+                        `引用的 id "${ref}" ` +
                         `目前不存在，将显示为未解析引用。`
                     );
                 }
