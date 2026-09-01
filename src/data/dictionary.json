@@ -1312,6 +1312,26 @@
     {
       "definition": "【拟似／伪冒／非真正成员】表示在外形、功能、名称、身份或宣传上类似 N，却不完全具备成为真正 N 的条件。这个前缀的核心不是“质量差”，而是类别资格不真实或不完整。",
       "gloss": "拟似"
+    },
+    {
+      "definition": "故意冒充真正的 N",
+      "gloss": "假冒"
+    },
+    {
+      "definition": "模仿 N 的外形或材料",
+      "gloss": "仿制"
+    },
+    {
+      "definition": "功能或表现接近 N",
+      "gloss": "类似"
+    },
+    {
+      "definition": "被称为 N，实际上不完全是",
+      "gloss": "名义"
+    },
+    {
+      "definition": "用于演练、展示或实验的 N 式物体",
+      "gloss": "模拟"
     }
   ],
   "formation": {
@@ -1326,7 +1346,8 @@
     "synonyms": [],
     "antonyms": [],
     "derived": [
-      "falloshirfe"
+      "falloshirfe",
+      "fallotalge"
     ]
   },
   "examples": [],

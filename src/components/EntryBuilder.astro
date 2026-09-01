@@ -35,6 +35,45 @@ const lookupEntries = dictionary.entries.map((entry) => ({
         )
         .filter(Boolean),
 
+
+    pronunciation:
+        entry.pronunciation ?? {
+            ipa: '',
+        },
+
+    formation:
+        entry.formation ?? {
+            type: 'simple',
+            analysis: '',
+            components: [],
+        },
+
+    etymology:
+        entry.etymology ?? '',
+
+    /*
+    * variants 目前是为了搜索而转换成的字符串数组。
+    * variantData 保存真正的原始异体对象。
+    */
+    variantData:
+        entry.variants ?? [],
+
+    relations:
+        entry.relations ?? {
+            related: [],
+            synonyms: [],
+            antonyms: [],
+            derived: [],
+        },
+
+    examples:
+        entry.examples ?? [],
+
+    notes:
+        entry.notes ?? '',
+
+
+
     tags: entry.tags ?? [],
 }));
 
@@ -120,9 +159,10 @@ const lookupJson =
 
 
             <span class="field-help">
-                当前为编辑模式第一阶段：
-                暂时只导入基本信息和义项，
-                因此不会允许复制替换 JSON。
+                选择已有词条后会完整载入当前数据。
+                ID 在编辑模式下保持锁定；
+                修改完成后复制右侧 JSON，
+                替换 dictionary.json 中原有的同 ID 词条。
             </span>
 
         </div>
@@ -2519,40 +2559,41 @@ const lookupJson =
 
 
         /*
-        * 第一阶段暂时不导入：
-        *
-        * Formation
-        * Variants
-        * Relations
-        * Examples
-        * Tags
-        * IPA
-        * Etymology
-        * Notes
-        *
-        * 为了避免这些区域残留旧内容，
-        * 进入编辑词条时先清空。
-        *
-        * 第二阶段这里会被完整导入逻辑替代。
+        * =========================================================
+        * Complete edit-mode import
+        * =========================================================
         */
-        function clearNonImportedFieldsForEdit() {
 
-            formationType.value =
-                'simple';
 
-            analysis.value =
+        /*
+        * 每次载入一个已有词条之前，
+        * 先清空所有动态列表。
+        *
+        * 这样从 matalge 切换到另一个词时，
+        * 不会残留前一个词的义项、关系、标签等。
+        */
+        function clearEditLoadTargets() {
+
+            senseList.innerHTML =
                 '';
 
             componentList.innerHTML =
                 '';
 
-            updateComponentVisibility();
-
-
             variantList.innerHTML =
                 '';
 
+            exampleList.innerHTML =
+                '';
 
+            tagList.innerHTML =
+                '';
+
+
+            /*
+            * Relations 不是一个统一列表，
+            * 所以只删除里面已经生成的 chips。
+            */
             relationSection
                 .querySelectorAll(
                     '.relation-chip'
@@ -2564,30 +2605,615 @@ const lookupJson =
                 );
 
 
-            exampleList.innerHTML =
-                '';
-
-
-            tagList.innerHTML =
-                '';
-
-
-            ipa.value =
-                '';
-
-            etymology.value =
-                '';
-
-            notes.value =
-                '';
+            /*
+            * 顺便清掉 relation 搜索框。
+            */
+            relationSection
+                .querySelectorAll(
+                    '.relation-input'
+                )
+                .forEach(
+                    (input) => {
+                        input.value = '';
+                    }
+                );
 
         }
 
 
         /*
-        * 把已有词条的 Basic + Senses
-        * 反向载入现有表单。
+        * 通过 ID 找到已经进入浏览器的词典词条。
+        *
+        * 用于：
+        * - Components 导入
+        * - Relations 导入
         */
+        function findExistingEntryById(
+            ref
+        ) {
+
+            return existingEntries.find(
+                (entry) =>
+                    entry.id === ref
+            ) ?? null;
+
+        }
+
+
+        /*
+        * =========================================================
+        * Formation components import
+        * =========================================================
+        *
+        * 这里复用我们原本的 addComponent()。
+        *
+        * 它先创建一个正常的“构词成分”控件，
+        * 然后我们再把旧数据填进去。
+        */
+        function addImportedFormationComponent(
+            componentData
+        ) {
+
+            /*
+            * 创建一行正常的构词成分。
+            */
+            addComponent();
+
+
+            const component =
+                componentList.lastElementChild;
+
+
+            if (!component) {
+                return;
+            }
+
+
+            const ref =
+                String(
+                    componentData.ref ?? ''
+                ).trim();
+
+
+            const form =
+                String(
+                    componentData.form ?? ''
+                );
+
+
+            component.dataset.ref =
+                ref;
+
+
+            const searchInput =
+                component.querySelector(
+                    '.component-search'
+                );
+
+            const formInput =
+                component.querySelector(
+                    '.component-form'
+                );
+
+            const statusElement =
+                component.querySelector(
+                    '.component-status'
+                );
+
+            const results =
+                component.querySelector(
+                    '.component-results'
+                );
+
+
+            const target =
+                ref
+                    ? findExistingEntryById(
+                        ref
+                    )
+                    : null;
+
+
+            /*
+            * 搜索框显示 headword。
+            *
+            * unresolved ref 没有 headword，
+            * 就直接显示 ID。
+            */
+            if (searchInput) {
+
+                searchInput.value =
+                    target?.headword ??
+                    ref;
+
+            }
+
+
+            /*
+            * 实际形式独立保存。
+            */
+            if (formInput) {
+
+                formInput.value =
+                    form;
+
+            }
+
+
+            /*
+            * 搜索状态提示。
+            */
+            if (statusElement) {
+
+                if (target) {
+
+                    statusElement.className =
+                        'component-status valid';
+
+                    statusElement.textContent =
+                        `✓ 已选择 ID: ${ref}`;
+
+                }
+                else if (ref) {
+
+                    statusElement.className =
+                        'component-status';
+
+                    statusElement.textContent =
+                        `暂未收录 ID: ${ref}`;
+
+                }
+                else {
+
+                    statusElement.className =
+                        'component-status';
+
+                    statusElement.textContent =
+                        '尚未选择引用。';
+
+                }
+
+            }
+
+
+            if (results) {
+                results.hidden = true;
+            }
+
+        }
+
+
+        /*
+        * 导入整个 Formation。
+        */
+        function loadFormationForEdit(
+            entry
+        ) {
+
+            const formation =
+                entry.formation ?? {
+                    type: 'simple',
+                    analysis: '',
+                    components: [],
+                };
+
+
+            formationType.value =
+                formation.type ??
+                'simple';
+
+
+            analysis.value =
+                formation.analysis ??
+                '';
+
+
+            componentList.innerHTML =
+                '';
+
+
+            (
+                formation.components ??
+                []
+            )
+                .forEach(
+                    (componentData) => {
+
+                        addImportedFormationComponent(
+                            componentData
+                        );
+
+                    }
+                );
+
+
+            /*
+            * 根据 formation.type
+            * 更新 Components 区域显示状态。
+            */
+            updateComponentVisibility();
+
+        }
+
+
+        /*
+        * =========================================================
+        * Variants import
+        * =========================================================
+        */
+
+        function loadVariantsForEdit(
+            entry
+        ) {
+
+            variantList.innerHTML =
+                '';
+
+
+            (
+                entry.variantData ??
+                []
+            )
+                .forEach(
+                    (variant) => {
+
+                        /*
+                        * 兼容极早期如果存在纯字符串 variant。
+                        */
+                        if (
+                            typeof variant ===
+                            'string'
+                        ) {
+
+                            addVariant(
+                                variant,
+                                ''
+                            );
+
+                            return;
+
+                        }
+
+
+                        addVariant(
+                            variant.form ?? '',
+                            variant.label ?? ''
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /*
+        * =========================================================
+        * Relations import
+        * =========================================================
+        */
+
+        function loadRelationsForEdit(
+            entry
+        ) {
+
+            /*
+            * 先删除已有 chip。
+            */
+            relationSection
+                .querySelectorAll(
+                    '.relation-chip'
+                )
+                .forEach(
+                    (chip) => {
+                        chip.remove();
+                    }
+                );
+
+
+            const relations =
+                entry.relations ?? {
+                    related: [],
+                    synonyms: [],
+                    antonyms: [],
+                    derived: [],
+                };
+
+
+            Object.entries(
+                relations
+            )
+                .forEach(
+                    ([relationType, refs]) => {
+
+                        if (
+                            !Array.isArray(refs)
+                        ) {
+                            return;
+                        }
+
+
+                        const group =
+                            relationSection
+                                .querySelector(
+                                    `[data-relation-type="${relationType}"]`
+                                );
+
+
+                        if (!group) {
+                            return;
+                        }
+
+
+                        refs.forEach(
+                            (ref) => {
+
+                                const target =
+                                    findExistingEntryById(
+                                        ref
+                                    );
+
+
+                                /*
+                                * 已收录：
+                                * 显示真正 headword。
+                                *
+                                * 未收录：
+                                * 保留 ref，并使用 pending 样式。
+                                */
+                                addRelationRef(
+                                    group,
+                                    ref,
+                                    target?.headword ??
+                                        ref,
+                                    !target
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /*
+        * =========================================================
+        * Tags import
+        * =========================================================
+        */
+
+        function loadTagsForEdit(
+            entry
+        ) {
+
+            tagList.innerHTML =
+                '';
+
+
+            (
+                entry.tags ??
+                []
+            )
+                .forEach(
+                    (tag) => {
+
+                        addTag(
+                            tag
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /*
+        * =========================================================
+        * Imported/raw Examples
+        * =========================================================
+        *
+        * dictionary.json 只保存：
+        *
+        * source
+        * gloss
+        * translation
+        *
+        * 它没有保存：
+        *
+        * lemma
+        * case
+        * tense
+        * component type
+        * ...
+        *
+        * 所以旧例句不能恢复成结构化分析器状态。
+        *
+        * 我们把旧例句作为“原始例句”导入，
+        * 三个字段可以直接编辑。
+        */
+        function addImportedExample(
+            exampleData
+        ) {
+
+            const example =
+                document.createElement(
+                    'div'
+                );
+
+
+            example.className =
+                'example-item';
+
+
+            /*
+            * 告诉自动 Gloss 系统：
+            *
+            * 这是旧 JSON 导入的例句，
+            * 不要重新计算 source / gloss。
+            */
+            example.dataset.rawImport =
+                'true';
+
+            example.dataset.glossManual =
+                'true';
+
+
+            example.innerHTML = `
+
+                <div class="dynamic-item-header">
+
+                    <strong class="example-title">
+                        例句
+                    </strong>
+
+
+                    <div class="imported-example-actions">
+
+                        <span class="imported-example-badge">
+                            已导入
+                        </span>
+
+
+                        <button
+                            type="button"
+                            class="
+                                delete-button
+                                delete-example
+                            "
+                        >
+                            删除例句
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="example-preview">
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            原文
+                        </span>
+
+                        <textarea
+                            class="
+                                example-source-preview
+                            "
+                            rows="2"
+                            placeholder="例句原文"
+                        ></textarea>
+
+                    </label>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            Gloss
+                        </span>
+
+                        <textarea
+                            class="
+                                example-gloss-preview
+                            "
+                            rows="2"
+                            placeholder="Gloss"
+                        ></textarea>
+
+                    </label>
+
+
+                    <label class="field">
+
+                        <span class="field-label">
+                            翻译
+                        </span>
+
+                        <textarea
+                            class="
+                                example-translation
+                            "
+                            rows="2"
+                            placeholder="可留空"
+                        ></textarea>
+
+                    </label>
+
+
+                </div>
+
+            `;
+
+
+            example.querySelector(
+                '.example-source-preview'
+            ).value =
+                exampleData.source ??
+                '';
+
+
+            example.querySelector(
+                '.example-gloss-preview'
+            ).value =
+                exampleData.gloss ??
+                '';
+
+
+            example.querySelector(
+                '.example-translation'
+            ).value =
+                exampleData.translation ??
+                '';
+
+
+            exampleList.appendChild(
+                example
+            );
+
+
+            refreshExampleNumbers();
+
+        }
+
+
+        /*
+        * 导入所有已有例句。
+        */
+        function loadExamplesForEdit(
+            entry
+        ) {
+
+            exampleList.innerHTML =
+                '';
+
+
+            (
+                entry.examples ??
+                []
+            )
+                .forEach(
+                    (exampleData) => {
+
+                        addImportedExample(
+                            exampleData
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /*
+        * =========================================================
+        * Complete loadEntryForEdit
+        * =========================================================
+        */
+
         function loadEntryForEdit(
             entry
         ) {
@@ -2603,18 +3229,29 @@ const lookupJson =
 
 
             /*
+            * 首先清空上一个词条的动态内容。
+            */
+            clearEditLoadTargets();
+
+
+            /*
+            * =====================================================
             * Basic
+            * =====================================================
             */
 
             headword.value =
-                entry.headword ?? '';
+                entry.headword ??
+                '';
+
 
             idInput.value =
-                entry.id ?? '';
+                entry.id ??
+                '';
+
 
             /*
-            * ID 是稳定引用，
-            * 编辑模式第一版直接锁定。
+            * ID 是稳定引用。
             */
             idInput.readOnly =
                 true;
@@ -2627,7 +3264,8 @@ const lookupJson =
 
 
             type.value =
-                entry.type ?? 'word';
+                entry.type ??
+                'word';
 
 
             root.querySelectorAll(
@@ -2637,7 +3275,10 @@ const lookupJson =
                     (checkbox) => {
 
                         checkbox.checked =
-                            (entry.pos ?? [])
+                            (
+                                entry.pos ??
+                                []
+                            )
                                 .includes(
                                     checkbox.value
                                 );
@@ -2651,11 +3292,11 @@ const lookupJson =
                 'established';
 
 
-            /*
-            * 当前 ID 本来就存在，
-            * 但这是我们正在编辑的那个，
-            * 所以它是合法的。
-            */
+            ipa.value =
+                entry.pronunciation?.ipa ??
+                '';
+
+
             idMessage.className =
                 'field-help valid';
 
@@ -2664,15 +3305,14 @@ const lookupJson =
 
 
             /*
+            * =====================================================
             * Senses
+            * =====================================================
             */
 
-            senseList.innerHTML =
-                '';
-
-
             const senses =
-                entry.senses ?? [];
+                entry.senses ??
+                [];
 
 
             if (
@@ -2688,8 +3328,11 @@ const lookupJson =
                     (sense) => {
 
                         addSense(
-                            sense.definition ?? '',
-                            sense.gloss ?? ''
+                            sense.definition ??
+                                '',
+
+                            sense.gloss ??
+                                ''
                         );
 
                     }
@@ -2699,20 +3342,93 @@ const lookupJson =
 
 
             /*
-            * 第一阶段其他字段清空。
+            * =====================================================
+            * Formation
+            * =====================================================
             */
-            clearNonImportedFieldsForEdit();
+
+            loadFormationForEdit(
+                entry
+            );
 
 
             /*
-            * 顶部显示当前编辑目标。
+            * =====================================================
+            * Etymology
+            * =====================================================
+            */
+
+            etymology.value =
+                entry.etymology ??
+                '';
+
+
+            /*
+            * =====================================================
+            * Variants
+            * =====================================================
+            */
+
+            loadVariantsForEdit(
+                entry
+            );
+
+
+            /*
+            * =====================================================
+            * Relations
+            * =====================================================
+            */
+
+            loadRelationsForEdit(
+                entry
+            );
+
+
+            /*
+            * =====================================================
+            * Examples
+            * =====================================================
+            */
+
+            loadExamplesForEdit(
+                entry
+            );
+
+
+            /*
+            * =====================================================
+            * Tags
+            * =====================================================
+            */
+
+            loadTagsForEdit(
+                entry
+            );
+
+
+            /*
+            * =====================================================
+            * Notes
+            * =====================================================
+            */
+
+            notes.value =
+                entry.notes ??
+                '';
+
+
+            /*
+            * 顶部编辑状态。
             */
             editSearch.value =
-                entry.headword ?? entry.id;
+                entry.headword ??
+                entry.id;
 
 
             editCurrent.hidden =
                 false;
+
 
             editCurrent.textContent =
                 `正在编辑：${entry.headword} · ID: ${entry.id}`;
@@ -2722,9 +3438,51 @@ const lookupJson =
                 true;
 
 
+            /*
+            * 同步浏览器 URL。
+            *
+            * 这样手动切换编辑对象以后，
+            * 刷新页面仍然会打开当前词条，
+            * 也可以直接复制这个 URL。
+            */
+            const editUrl =
+                new URL(
+                    window.location.href
+                );
+
+            editUrl.searchParams.delete(
+                'new'
+            );
+
+            editUrl.searchParams.set(
+                'edit',
+                entry.id
+            );
+
+
+            history.replaceState(
+                null,
+                '',
+                editUrl
+            );
+
+
+            /*
+            * 编辑模式现在已经是完整导入，
+            * 所以按钮也可以明确改名。
+            */
+            copyButton.textContent =
+                '复制替换 JSON';
+
+
+            /*
+            * 最终统一刷新一次。
+            */
             update();
 
         }
+
+
 
 
         /*
@@ -4744,6 +5502,20 @@ const lookupJson =
         function refreshExamplePreview(
             example
         ) {
+
+
+            /*
+            * 从旧 dictionary.json 导入的 raw example
+            * 已经只有 source / gloss / translation。
+            *
+            * 不重新根据 Components 计算。
+            */
+            if (
+                example.dataset.rawImport ===
+                'true'
+            ) {
+                return;
+            }
 
             const components =
                 Array.from(
@@ -7513,39 +8285,49 @@ const lookupJson =
             }
 
 
-            /*
-            * 编辑模式第一阶段只导入
-            * Basic + Senses。
-            *
-            * 为防止误覆盖旧词条，
-            * 暂时禁止复制。
-            */
             if (
                 builderMode === 'edit'
             ) {
 
-                validation.className =
-                    'validation warning';
+                copyButton.textContent =
+                    '复制替换 JSON';
 
 
-                if (editingId) {
+                /*
+                * 尚未真正选择词条。
+                */
+                if (!editingId) {
 
-                    validation.textContent =
-                        `正在编辑 "${editingId}"。` +
-                        ` 当前第一阶段只导入基本信息和义项，` +
-                        ` 暂不可复制替换 JSON。`;
-
-                }
-                else {
+                    validation.className =
+                        'validation warning';
 
                     validation.textContent =
                         '编辑模式：请选择一个已有词条。';
 
+                    copyButton.disabled =
+                        true;
+
+                    return;
+
                 }
 
 
+                /*
+                * 能执行到这里，说明前面的
+                * validateEntry() 没有发现错误。
+                *
+                * 现在已经完整导入，可以安全复制。
+                */
+                validation.className =
+                    'validation valid';
+
+                validation.textContent =
+                    `✓ "${editingId}" 已完整导入。` +
+                    ` 修改后可复制 JSON，替换原有同 ID 词条。`;
+
+
                 copyButton.disabled =
-                    true;
+                    false;
 
                 return;
 
@@ -7947,15 +8729,258 @@ const lookupJson =
         );
 
 
+                /* =====================================
+           URL presets
+           ===================================== */
+
+
+        /*
+         * ?new=bur-
+         *
+         * 新建一个词条，
+         * 但预先填入指定的 ID。
+         *
+         * 这正是 Dictionary Maintenance
+         * 的“补充未解析引用”功能使用的模式。
+         */
+        function loadNewEntryPresetFromUrl() {
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            const presetId =
+                params.get(
+                    'new'
+                );
+
+
+            if (!presetId) {
+                return false;
+            }
+
+
+            /*
+             * 保持新建模式。
+             */
+            builderMode =
+                'new';
+
+            editingId =
+                null;
+
+
+            updateModeButtons();
+
+
+            /*
+            * 默认让词头与 ID 相同。
+            *
+            * 大多数情况下二者一致；
+            * 如果是 nu → nu(-e) 之类的特殊词头，
+            * 用户之后再手动修改即可。
+            */
+            headword.value =
+                presetId;
+
+            idInput.value =
+                presetId;
+
+
+            /*
+             * 这个 ID 是从 Maintenance
+             * 明确传过来的，
+             * 因此视为人工指定。
+             *
+             * 后面输入词头时，
+             * 不允许自动 ID 生成把它覆盖掉。
+             */
+            idEditedManually =
+                true;
+
+
+            /*
+             * 新建模式允许修改 ID。
+             */
+            idInput.readOnly =
+                false;
+
+            regenerateId.disabled =
+                false;
+
+
+            updateManualIdMessage();
+
+            update();
+
+
+            return true;
+
+        }
+
+
+        /*
+         * ?edit=matalge
+         *
+         * 自动进入编辑模式，
+         * 并载入指定的已有词条。
+         */
+        function loadEditTargetFromUrl() {
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            const editId =
+                params.get(
+                    'edit'
+                );
+
+
+            if (!editId) {
+                return false;
+            }
+
+
+            /*
+             * 如果已经是当前词条，
+             * 就不重复导入。
+             */
+            if (
+                builderMode === 'edit' &&
+                editingId === editId
+            ) {
+
+                return true;
+
+            }
+
+
+            const entry =
+                existingEntries.find(
+                    (item) =>
+                        item.id === editId
+                );
+
+
+            /*
+             * ID 不存在：
+             * 页面不报错，
+             * 进入编辑模式并显示提示。
+             */
+            if (!entry) {
+
+                builderMode =
+                    'edit';
+
+                editingId =
+                    null;
+
+
+                updateModeButtons();
+
+
+                idInput.readOnly =
+                    true;
+
+                regenerateId.disabled =
+                    true;
+
+
+                editSearch.value =
+                    editId;
+
+
+                editCurrent.hidden =
+                    false;
+
+                editCurrent.textContent =
+                    `未找到 ID "${editId}"。` +
+                    ` 可以重新搜索其他已有词条。`;
+
+
+                editResults.hidden =
+                    true;
+
+
+                update();
+
+
+                return true;
+
+            }
+
+
+            /*
+             * 找到已有词条：
+             * 直接调用 Stage 2 已经完成的
+             * 完整导入函数。
+             */
+            loadEntryForEdit(
+                entry
+            );
+
+
+            return true;
+
+        }
+
+
+        /*
+         * 根据 URL 决定启动模式。
+         *
+         * 优先级：
+         *
+         * ?new=id
+         * ↓
+         * ?edit=id
+         * ↓
+         * 普通新建模式
+         */
+        function initialiseFromUrl() {
+
+            const loadedNew =
+                loadNewEntryPresetFromUrl();
+
+
+            if (loadedNew) {
+                return;
+            }
+
+
+            loadEditTargetFromUrl();
+
+        }
+
+
         /* =====================================
            Initialise
            ===================================== */
 
+        /*
+         * 首先建立普通的新词条界面。
+         */
         addSense();
 
         updateComponentVisibility();
+
         updateAutomaticId();
+
         update();
+
+
+        /*
+         * 然后再读取 URL。
+         *
+         * 如果有 ?new=...
+         * 或 ?edit=...
+         * 就覆盖普通初始状态。
+         */
+        initialiseFromUrl();
 
     }
 

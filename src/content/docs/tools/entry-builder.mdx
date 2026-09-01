@@ -10,6 +10,8 @@ import EntryBuilder from '@components/EntryBuilder.astro';
 
 填写词条信息后，页面会自动生成符合雪地语词典 V1 schema 的 JSON 对象。
 
+本工具不会直接修改词典数据；新建词条时，将生成结果加入 `dictionary.json` 的 `entries` 数组；编辑已有词条时，用生成结果替换原有的同 ID 词条。
+
 本工具不会直接修改词典数据；生成结果需要复制后加入 `dictionary.json` 的 `entries` 数组。
 
 <EntryBuilder />

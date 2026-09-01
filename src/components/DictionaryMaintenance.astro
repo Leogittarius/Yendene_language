@@ -653,16 +653,26 @@ const deprecatedCount =
                                                 {item.id}
                                             </code>
 
-                                            <span
-                                                class="reference-count"
-                                            >
-                                                {
-                                                    item.sources
-                                                        .length
-                                                }
-                                                {' '}
-                                                处引用
-                                            </span>
+
+                                            <div class="unresolved-header-actions">
+
+                                                <span
+                                                    class="reference-count"
+                                                >
+                                                    {item.sources.length}
+                                                    {' '}
+                                                    处引用
+                                                </span>
+
+
+                                                <a
+                                                    class="source-create"
+                                                    href={`/tools/entry-builder/?new=${encodeURIComponent(item.id)}`}
+                                                >
+                                                    新建词条
+                                                </a>
+
+                                            </div>
 
                                         </header>
 
@@ -699,7 +709,8 @@ const deprecatedCount =
 
 
                                                             {
-                                                                source.detail && (
+                                                                source.detail ? (
+
                                                                     <span
                                                                         class="reference-detail"
                                                                     >
@@ -707,8 +718,16 @@ const deprecatedCount =
                                                                             source.detail
                                                                         }
                                                                     </span>
+
+                                                                ) : (
+
+                                                                    <span
+                                                                        class="reference-detail"
+                                                                    ></span>
+
                                                                 )
                                                             }
+
 
                                                         </div>
 
@@ -1326,6 +1345,63 @@ const deprecatedCount =
         font-size: 0.78rem;
     }
 
+    .source-create {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        align-self: center;
+
+        min-height: 1.8rem;
+
+        margin: 0 !important;
+        padding:
+            0
+            0.55rem;
+
+        border:
+            1px solid
+            var(--sl-color-hairline);
+
+        border-radius:
+            0.35rem;
+
+        color:
+            var(--sl-color-gray-2);
+
+        font-size: 0.74rem;
+
+        white-space: nowrap;
+
+        text-decoration:
+            none !important;
+
+        transition:
+            border-color 150ms ease,
+            background-color 150ms ease,
+            color 150ms ease;
+    }
+
+
+    .source-create:hover {
+        border-color:
+            var(--sl-color-accent);
+
+        background:
+            var(--sl-color-accent-low);
+
+        color:
+            var(--sl-color-accent-high);
+    }
+
+    .unresolved-header-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.65rem;
+}
 
     /* =====================================================
        Lists
